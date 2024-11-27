@@ -1,4 +1,4 @@
 
-# HomeWork for CS236781: Deep Learning.
+# HomeWork for CS236781: Deep Learning
 
-## Made by Diar Bathish and Hadi Hboos.
+# Made by Diar Bathish and Hadi Hboos
