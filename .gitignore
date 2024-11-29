@@ -1,0 +1,7 @@
+# Ignores Part0_Intro.ipynb for privacy reasons
+Part0_Intro.ipynb
+
+# Ignore Python compiled files
+
+*.pyc
+__pycache__/
