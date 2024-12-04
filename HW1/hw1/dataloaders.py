@@ -3,7 +3,11 @@ import numpy as np
 import torch
 import torch.utils.data
 from typing import Sized, Iterator
-from torch.utils.data import Dataset, Sampler
+from torch.utils.data import Dataset, Sampler, DataLoader
+import torch.utils.data.dataloader
+import torch.utils.data.sampler as torch_sampler
+
+from torch.utils.data.sampler import SubsetRandomSampler
 
 
 class FirstLastSampler(Sampler):
@@ -20,13 +24,18 @@ class FirstLastSampler(Sampler):
         self.data_source = data_source
 
     def __iter__(self) -> Iterator[int]:
-        # TODO:
-        # Implement the logic required for this sampler.
-        # If the length of the data source is N, you should return indices in a
-        # first-last ordering, i.e. [0, N-1, 1, N-2, ...].
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        low = 0
+        high = self.__len__() - 1
+        flag = 0
+        while low <= high:
+            if flag == 0:
+                flag = 1
+                low += 1
+                yield low - 1
+            elif flag == 1:
+                flag = 0
+                high -= 1
+                yield high + 1
 
     def __len__(self):
         return len(self.data_source)
@@ -48,17 +57,24 @@ def create_train_validation_loaders(
     if not (0.0 < validation_ratio < 1.0):
         raise ValueError(validation_ratio)
 
-    # TODO:
-    #  Create two DataLoader instances, dl_train and dl_valid.
-    #  They should together represent a train/validation split of the given
-    #  dataset. Make sure that:
-    #  1. Validation set size is validation_ratio * total number of samples.
-    #  2. No sample is in both datasets. You can select samples at random
-    #     from the dataset.
-    #  Hint: you can specify a Sampler class for the `DataLoader` instance
-    #  you create.
-    # ====== YOUR CODE: ======
-    raise NotImplementedError()
-    # ========================
+    validation_size = int(validation_ratio * len(dataset))
+
+    train_sampler = SubsetRandomSampler(
+        [i for i in range(validation_size, len(dataset))]
+    )
+    validation_sampler = SubsetRandomSampler([i for i in range(validation_size)])
+
+    dl_train = DataLoader(
+        dataset=dataset,
+        num_workers=num_workers,
+        sampler=train_sampler,
+        batch_size=batch_size,
+    )
+    dl_valid = DataLoader(
+        dataset=dataset,
+        num_workers=num_workers,
+        sampler=validation_sampler,
+        batch_size=batch_size,
+    )
 
     return dl_train, dl_valid

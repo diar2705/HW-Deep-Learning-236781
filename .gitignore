@@ -5,3 +5,6 @@ HW1/Part0_Intro.ipynb
 
 *.pyc
 __pycache__/
+HW1/Part1_Datasets.ipynb
+HW1/Part2_LinearClassifier.ipynb
+HW1/Part3_LinearRegression.ipynb

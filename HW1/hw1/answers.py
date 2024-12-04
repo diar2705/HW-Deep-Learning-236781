@@ -10,15 +10,27 @@ math (delimited with $$).
 
 part1_q1 = r"""
 **Your answer:**
-
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
-
+1.  False:
+    The in-sample error measures the error of the model we trained on the same training data,
+    in other words, it measures how well the model fits the training data.
+    But the test set allows us to estimate the out-sample error, or in other words, the generalization error,
+    which measures how well the model fits unseen data.
+    
+2.  False:
+    For example, if our task is to identify horses, and we only train the model on white horses 
+    (the training set only has white horses), but we tested it on pictures of brown and black horses 
+    (the test set contains black and brown horses).
+    Here the model wouldn't classify them (black and brown horses) as horses, as opposed to a model that 
+    was trained with a training set that contains all types and colors of horses.
+    So not all splits constitute an equally useful train-test split.
+    
+3.  True:
+    the cross-validation is used to tune the hyperparameters when training the model.
+    So using the test set during cross-validation will lead to an unrealistic loss during the test of our model
+    because the model saw this data before (A leak happened) which is against the rule testing the model on
+    unseen data.
+4.  True:
+    
 """
 
 part1_q2 = r"""
