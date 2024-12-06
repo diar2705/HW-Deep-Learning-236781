@@ -1,7 +1,6 @@
 import torch
 
 
-
 class TensorView(object):
     """
     A transform that returns a new view of a tensor.
@@ -10,8 +9,9 @@ class TensorView(object):
     def __init__(self, *view_dims):
         self.view_dims = view_dims
 
-    def __call__(self, tensor: torch.Tensor):  
+    def __call__(self, tensor: torch.Tensor):
         return tensor.view(*self.view_dims)
+
 
 class InvertColors(object):
     """
@@ -24,7 +24,7 @@ class InvertColors(object):
             representing an image.
         :return: The image with inverted colors.
         """
-        return 1. - x
+        return 1.0 - x
 
 
 class FlipUpDown(object):
@@ -52,10 +52,5 @@ class BiasTrick(object):
         each sample's feature dimension.
         """
         assert x.dim() > 0, "Scalars not supported"
-
-        # TODO:
-        #  Add a 1 at the beginning of the given tensor's feature dimension.
-        #  Hint: See torch.cat().
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        
+        return torch.cat((torch.ones((*x.shape[:-1], 1), dtype=x.dtype, device=x.device), x), dim=-1)
