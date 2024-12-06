@@ -9,7 +9,6 @@ math (delimited with $$).
 # Part 1 answers
 
 part1_q1 = r"""
-**Your answer:**
 1.  False:
     The in-sample error measures the error of the model we trained on the same training data,
     in other words, it measures how well the model fits the training data.
@@ -25,25 +24,24 @@ part1_q1 = r"""
     So not all splits constitute an equally useful train-test split.
     
 3.  True:
-    the cross-validation is used to tune the hyperparameters when training the model.
+    The cross-validation is used to tune the hyperparameters when training the model.
     So using the test set during cross-validation will lead to an unrealistic loss during the test of our model
     because the model saw this data before (A leak happened) which is against the rule testing the model on
     unseen data.
-4.  True:
-    
+
+4.  True: 
+    The cross-validation is used to tune the hyperparameters when training the model, and it is used on an unseen data
+    during the training stage.
+    Cross-validation provides a more realistic estimate of the model's generalization performance,
+    Therefore each validation set is used as an approximation method for the model's generalization error.
 """
 
 part1_q2 = r"""
-**Your answer:**
-
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
-
+Answer:
+    No, his approach isn't justified.
+    The tunning of the hyperparameters is done only during the training stage, using only the training set, 
+    and the test set shouldn't be incorporated into the tuning of the hyperparameters. Using the test set would result
+    an unrealistic loss and would overfit to the test data, something that we don't want to happen, as we want to generalize.
 """
 
 # ==============
