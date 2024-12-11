@@ -37,7 +37,7 @@ part1_q1 = r"""
 """
 
 part1_q2 = r"""
-Answer:
+**Answer:**
     No, his approach isn't justified.
     The tunning of the hyperparameters is done only during the training stage, using only the training set, 
     and the test set shouldn't be incorporated into the tuning of the hyperparameters. Using the test set would result
@@ -48,16 +48,9 @@ Answer:
 # Part 2 answers
 
 part2_q1 = r"""
-**Your answer:**
-
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
-
+If the margin threshold $\Delta$ is negative, the margin for correct classification would be set in
+such a way that the classifier penalizes points that are correctly classified by a large margin.
+Else, if it's positive, 
 """
 
 part2_q2 = r"""

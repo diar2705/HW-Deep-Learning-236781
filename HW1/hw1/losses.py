@@ -41,17 +41,15 @@ class SVMHingeLoss(ClassifierLoss):
 
         assert x_scores.shape[0] == y.shape[0]
         assert y.dim() == 1
-        
-        # calculate the true class scores
+
         true_classes_scores = torch.gather(x_scores, 1, y.view(-1, 1))
-        # calculate the  Create a matrix M where M[i,j] is the margin-loss 
-        # for sample i and class j (i.e. s_j - s_{y_i} + delta).
         M = self.delta + x_scores - true_classes_scores
-        # calculate the loss 
         M = torch.max(M, torch.zeros(M.size()))
         loss = torch.mean(torch.sum(M, 1) - self.delta)
-        
-        # TODO: Save what you need for gradient calculation in self.grad_ctx
+
+        self.grad_ctx["M"] = M
+        self.grad_ctx["X"] = x
+        self.grad_ctx["Y"] = y
 
         return loss
 
@@ -59,16 +57,14 @@ class SVMHingeLoss(ClassifierLoss):
         """
         Calculates the gradient of the Hinge-loss w.r.t. parameters.
         :return: The gradient, of shape (D, C).
-
         """
-        # TODO:
-        #  Implement SVM loss gradient calculation
-        #  Same notes as above. Hint: Use the matrix M from above, based on
-        #  it create a matrix G such that X^T * G is the gradient.
 
-        grad = None
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        M = self.grad_ctx["M"]
+        x = self.grad_ctx["X"]
+        y = self.grad_ctx["Y"]
+        N = x.shape[0]
+        indicators = (M > 0).float()
+        indicators[range(N), y] -= indicators.sum(dim=1)
+        grad = (torch.transpose(x, 0, 1) @ indicators) / N
 
         return grad
