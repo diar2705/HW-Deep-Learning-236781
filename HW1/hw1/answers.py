@@ -48,35 +48,25 @@ part1_q2 = r"""
 # Part 2 answers
 
 part2_q1 = r"""
+**Answer:**
 If the margin threshold $\Delta$ is negative, the margin for correct classification would be set in
 such a way that the classifier penalizes points that are correctly classified by a large margin.
 Else, if it's positive, 
 """
 
 part2_q2 = r"""
-**Your answer:**
+**Answer:**
+The linear model learns by assigning likelihoods to each pixel based on how well it matches each class’s features. For example, it gives high scores for a straight line to classify the digit "1." However, it struggles with similar-looking digits like 5 and 6. It works by drawing hyperplanes to separate classes in space, but errors happen when a sample is closer to the wrong class boundary.
 
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
 
 """
 
 part2_q3 = r"""
-**Your answer:**
+**Answer:**
+1. Based on the training loss graph, we can conclude that the chosen learning rate is good. Initially, the loss decreases significantly, showing rapid progress, and then slows down as it approaches a low value, if our answer was too low then the graph should be close to a linear graph and if our answer was too high then the the loss graph would drop quickly at first but fluctuate around the minimum without settling smoothly.
 
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
-
+2. Our model shows slightly overfitting to the training data, as the training accuracy is higher than the validation accuracy, However, the difference between them is small.
 """
 
 # ==============
@@ -85,41 +75,19 @@ An equation: $e^{i\pi} -1 = 0$
 # Part 3 answers
 
 part3_q1 = r"""
-**Your answer:**
-
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+**Answer:**
 
 """
 
 part3_q2 = r"""
-**Your answer:**
+**Answer:**
 
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
 
 """
 
 part3_q3 = r"""
-**Your answer:**
+**Answer:**
 
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
 
 """
 
