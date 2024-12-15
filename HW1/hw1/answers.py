@@ -9,6 +9,7 @@ math (delimited with $$).
 # Part 1 answers
 
 part1_q1 = r"""
+**Answer:**
 1.  False:
     The in-sample error measures the error of the model we trained on the same training data,
     in other words, it measures how well the model fits the training data.
@@ -49,14 +50,16 @@ part1_q2 = r"""
 
 part2_q1 = r"""
 **Answer:**
-If the margin threshold $\Delta$ is negative, the margin for correct classification would be set in
-such a way that the classifier penalizes points that are correctly classified by a large margin.
-Else, if it's positive, 
+    If the margin threshold $\Delta$ is negative, the margin for correct classification would be set in
+    such a way that the classifier penalizes points that are correctly classified by a large margin.
 """
 
 part2_q2 = r"""
 **Answer:**
-The linear model learns by assigning likelihoods to each pixel based on how well it matches each class’s features. For example, it gives high scores for a straight line to classify the digit "1." However, it struggles with similar-looking digits like 5 and 6. It works by drawing hyperplanes to separate classes in space, but errors happen when a sample is closer to the wrong class boundary.
+    The linear model learns by assigning likelihoods to each pixel based on how well it matches each class’s features.
+    For example, it gives high scores for a straight line to classify the digit "1".
+    However, it struggles with similar-looking digits like 5 and 6.
+    It works by drawing hyperplanes to separate classes in space, but errors happen when a sample is closer to the wrong class boundary.
 
 
 
@@ -64,9 +67,13 @@ The linear model learns by assigning likelihoods to each pixel based on how well
 
 part2_q3 = r"""
 **Answer:**
-1. Based on the training loss graph, we can conclude that the chosen learning rate is good. Initially, the loss decreases significantly, showing rapid progress, and then slows down as it approaches a low value, if our answer was too low then the graph should be close to a linear graph and if our answer was too high then the the loss graph would drop quickly at first but fluctuate around the minimum without settling smoothly.
+1.  Based on the training loss graph, we can conclude that the chosen learning rate is good.
+    Initially, the loss decreases significantly, showing rapid progress, and then slows down as it approaches a low value,
+    if our answer was too low then the graph should be close to a linear graph and if our answer was too high then
+    the loss graph would drop quickly at first but fluctuate around the minimum without settling smoothly.
 
-2. Our model shows slightly overfitting to the training data, as the training accuracy is higher than the validation accuracy, However, the difference between them is small.
+2.  Our model shows slightly overfitting to the training data, as the training accuracy is higher than the validation accuracy,
+    However, the difference between them is small.
 """
 
 # ==============
