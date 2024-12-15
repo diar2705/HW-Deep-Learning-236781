@@ -83,18 +83,38 @@ part2_q3 = r"""
 
 part3_q1 = r"""
 **Answer:**
-
+    The ideal residual plot shows a random scatter of points evenly distributed around zero, indicating unbiased and accurate predictions. 
+    For the top-5 features, the residual plot displayed a curve deviating from zero, suggesting the model struggled to capture key relationships.
+    After adding non-linear features and applying K-fold cross-validation, the residuals became more evenly spread and closer to zero, 
+    improving the model’s score ($R^2$) from 0.68 to 0.91. The similar behavior of train and test residuals indicates good generalization and minimal overfitting.
 """
 
 part3_q2 = r"""
 **Answer:**
+1.  The linearity of our model is determined by its parameters, specifically the weights and biases. Adding non-linear features changes the representation of the data by increasing the dimensionality of the feature space, 
+    effectively transforming the problem into one that aligns better with a linear relationship. While the regression equation itself remains linear, 
+    the pipeline as a whole introduces non-linearity due to the transformed features, making the overall process non-linear while the predictor remains fundamentally linear.
+    
+    
+2.  With this approach, we can model any non-linear function of the original features by incorporating non-linear transformations into the feature set.
+    This allows us to perform a higher-dimensional linear regression on the transformed features, effectively capturing non-linear relationships in the data. However,
+    this comes at the cost of increased computational complexity.
 
-
+3.  Adding non-linear features increases the dimensionality of the feature space, allowing a linear decision boundary (hyperplane) to better separate the classes. 
+    For instance, adding a feature like the squared Euclidean distance can turn a non-separable 2D problem into one that is linearly separable in higher dimensions.
+    While the decision boundary remains a linear hyperplane in this new space, 
+    it becomes non-linear when projected back to the original space due to the transformed features.
 """
 
 part3_q3 = r"""
 **Answer:**
+1.  We use np.logspace because it generates logarithmically spaced values, 
+    which is ideal for hyperparameters like regularization strength. 
+    Small changes in such hyperparameters can have a big impact on model performance,
+    and the log scale helps explore a wide range of values across several orders of magnitude, 
+    capturing the non-linear relationship between the hyperparameter and the model's performance.
 
+2.  We used 20 lambda values, 3 degree values, and 3 folds, thus the model was fitted $20 \cdot 3 \cdot 3 = 180$ times.
 
 """
 

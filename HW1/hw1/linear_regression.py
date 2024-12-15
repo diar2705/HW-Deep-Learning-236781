@@ -106,10 +106,12 @@ class BostonFeaturesTransformer(BaseEstimator, TransformerMixin):
         :returns: Matrix of shape (n_samples, n_output_features_).
         """
         X = check_array(X)
-        X_transformed = np.delete(X, 3, axis=1)
+        X_transformed = self.poly.fit_transform(X)
+        X_transformed[:, 1] = np.log(X_transformed[:, 1])
+        X_transformed[:, -2] = np.log(X_transformed[:, -2])
         
-        X_transformed = self.poly.fit_transform(X_transformed) 
-        X_transformed = np.hstack((X,X_transformed))
+        X_transformed = np.delete(X_transformed, 4, axis=1)
+        
         return X_transformed
 
 
@@ -182,6 +184,5 @@ def cv_best_hyperparams(
     )
     best_model = grid_search_cv.fit(X, y)
     best_params = best_model.best_params_
-    # ========================
 
     return best_params
