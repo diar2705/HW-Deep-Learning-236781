@@ -4,4 +4,4 @@
 
 *.pyc
 __pycache__/
-
+*.ipynb
