@@ -79,11 +79,7 @@ class LeakyReLU(Layer):
         dimension, and * is any number of other dimensions.
         :return: LeakyReLU of each sample in x.
         """
-
-        # TODO: Implement the LeakyReLU operation.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        out = torch.max(self.alpha * x, x)
 
         self.grad_cache["x"] = x
         return out
@@ -94,13 +90,8 @@ class LeakyReLU(Layer):
         :return: Gradient with respect to layer input, shape (N, *)
         """
         x = self.grad_cache["x"]
-
-        # TODO: Implement gradient w.r.t. the input x
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
-
-        return dx
+        
+        return torch.where(x > 0, dout, self.alpha * dout)
 
     def params(self):
         return []
@@ -115,9 +106,7 @@ class ReLU(LeakyReLU):
     """
 
     def __init__(self):
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        super().__init__(alpha=0)
 
     def __repr__(self):
         return "ReLU"
@@ -138,12 +127,11 @@ class Sigmoid(Layer):
         dimension, and * is any number of other dimensions.
         :return: Sigmoid of each sample in x.
         """
-
-        # TODO: Implement the Sigmoid function.
-        #  Save whatever you need into grad_cache.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        
+        out = 1/(1 + torch.exp(-x))
+        
+        self.grad_cache["s"] = out
+        self.grad_cache["x"] = x
 
         return out
 
@@ -152,13 +140,10 @@ class Sigmoid(Layer):
         :param dout: Gradient with respect to layer output, shape (N, *).
         :return: Gradient with respect to layer input, shape (N, *)
         """
-
-        # TODO: Implement gradient w.r.t. the input x
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
-
-        return dx
+        
+        s = self.grad_cache["s"]
+        x = self.grad_cache["x"]
+        return dout * s * s * torch.exp(-x)
 
     def params(self):
         return []
@@ -179,12 +164,9 @@ class TanH(Layer):
         dimension, and * is any number of other dimensions.
         :return: Sigmoid of each sample in x.
         """
-
-        # TODO: Implement the tanh function.
-        #  Save whatever you need into grad_cache.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        
+        out = (torch.exp(x) - torch.exp(-x)) / (torch.exp(x) + torch.exp(-x))
+        self.grad_cache["x"] = x
 
         return out
 
@@ -193,13 +175,10 @@ class TanH(Layer):
         :param dout: Gradient with respect to layer output, shape (N, *).
         :return: Gradient with respect to layer input, shape (N, *)
         """
+        x = self.grad_cache["x"]
+        
 
-        # TODO: Implement gradient w.r.t. the input x
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
-
-        return dx
+        return dout * (4*torch.exp(2*x)) / (torch.exp(2*x)+1)**2
 
     def params(self):
         return []
