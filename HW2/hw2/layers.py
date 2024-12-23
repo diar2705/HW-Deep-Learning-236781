@@ -198,13 +198,9 @@ class Linear(Layer):
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
-
-        # TODO: Create the weight matrix (self.w) and bias vector (self.b).
-        # Initialize the weights to zero-mean gaussian noise with a standard
-        # deviation of `wstd`. Init bias to zero.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        
+        self.w = torch.normal(mean=0,std=wstd,size=(self.out_features,self.in_features))
+        self.b = torch.zeros(size=(self.out_features,))
 
         # These will store the gradients
         self.dw = torch.zeros_like(self.w)
@@ -220,14 +216,10 @@ class Linear(Layer):
         dimension, and Din is the number of input features.
         :return: Affine transform of each sample in x.
         """
-
-        # TODO: Compute the affine transform
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        
 
         self.grad_cache["x"] = x
-        return out
+        return torch.matmul(x,self.w.T) + self.b
 
     def backward(self, dout):
         """
@@ -236,14 +228,9 @@ class Linear(Layer):
         """
         x = self.grad_cache["x"]
 
-        # TODO: Compute
-        #   - dx, the gradient of the loss with respect to x
-        #   - dw, the gradient of the loss with respect to w
-        #   - db, the gradient of the loss with respect to b
-        #  Note: You should ACCUMULATE gradients in dw and db.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        dx = torch.matmul(dout , self.w)
+        self.dw += torch.matmul(dout.T,x)
+        self.db += dout.sum(dim=0)
 
         return dx
 
@@ -279,16 +266,11 @@ class CrossEntropyLoss(Layer):
         # Shift input for numerical stability
         xmax, _ = torch.max(x, dim=1, keepdim=True)
         x = x - xmax
-
-        # TODO: Compute the cross entropy loss using the last formula from the
-        #  notebook (i.e. directly using the class scores).
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        loss = torch.gather(-x,dim=1,index=y.view(-1,1))+torch.log(torch.sum(torch.exp(x),dim=1))
 
         self.grad_cache["x"] = x
         self.grad_cache["y"] = y
-        return loss
+        return loss.mean()
 
     def backward(self, dout=1.0):
         """
@@ -299,13 +281,12 @@ class CrossEntropyLoss(Layer):
         x = self.grad_cache["x"]
         y = self.grad_cache["y"]
         N = x.shape[0]
-
-        # TODO: Calculate the gradient w.r.t. the input x.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
-
-        return dx
+        
+        dx = torch.exp(x) / torch.sum(torch.exp(x),dim=1,keepdim=True)
+        dx[range(N),y] -= 1
+        
+        return torch.mul(dx,dout/N) 
+        
 
     def params(self):
         return []
