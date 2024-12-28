@@ -337,35 +337,26 @@ class Sequential(Layer):
         self.layers = layers
 
     def forward(self, x, **kw):
-        out = None
-
-        # TODO: Implement the forward pass by passing each layer's output
-        #  as the input of the next.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
-
+        out = x
+        for layer in self.layers:
+            out = layer.forward(x,**kw)
+            x = out
         return out
 
     def backward(self, dout):
-        din = None
-
-        # TODO: Implement the backward pass.
-        #  Each layer's input gradient should be the previous layer's output
-        #  gradient. Behold the backpropagation algorithm in action!
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        din = dout
+        
+        for layer in reversed(self.layers):
+            din = layer.backward(dout)
+            dout = din
 
         return din
 
     def params(self):
         params = []
 
-        # TODO: Return the parameter tuples from all layers.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        for layer in self.layers:
+            params += layer.params()
 
         return params
 
@@ -419,11 +410,15 @@ class MLP(Layer):
         :param: Dropout probability. Zero means no dropout.
         """
         layers = []
-
-        # TODO: Build the MLP architecture as described.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        
+        for h in hidden_features:
+            layers.append(Linear(in_features,h))
+            if activation == "relu":
+                layers.append(ReLU())
+            else:
+                layers.append(Sigmoid())
+            in_features = h
+        layers.append(Linear(in_features,num_classes))
 
         self.sequence = Sequential(*layers)
 

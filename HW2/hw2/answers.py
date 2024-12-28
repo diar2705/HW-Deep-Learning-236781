@@ -40,28 +40,20 @@ An equation: $e^{i\pi} -1 = 0$
 
 
 def part2_overfit_hp():
-    wstd, lr, reg = 0, 0, 0
-    # TODO: Tweak the hyperparameters until you overfit the small dataset.
-    # ====== YOUR CODE: ======
-    raise NotImplementedError()
-    # ========================
+    wstd, lr, reg = 0.1, 0.05, 0
+
     return dict(wstd=wstd, lr=lr, reg=reg)
 
 
 def part2_optim_hp():
     wstd, lr_vanilla, lr_momentum, lr_rmsprop, reg, = (
-        0,
-        0,
-        0,
-        0,
-        0,
+        0.04,
+        0.05,
+        0.9999,
+        0.001,
+        0.002
     )
 
-    # TODO: Tweak the hyperparameters to get the best results you can.
-    # You may want to use different learning rates for each optimizer.
-    # ====== YOUR CODE: ======
-    raise NotImplementedError()
-    # ========================
     return dict(
         wstd=wstd,
         lr_vanilla=lr_vanilla,
