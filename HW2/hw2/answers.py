@@ -49,8 +49,8 @@ def part2_optim_hp():
     wstd, lr_vanilla, lr_momentum, lr_rmsprop, reg, = (
         0.04,
         0.05,
-        0.9999,
-        0.001,
+        3e-3,
+        14e-5,
         0.002
     )
 
