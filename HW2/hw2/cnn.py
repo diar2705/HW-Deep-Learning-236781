@@ -68,7 +68,11 @@ class CNN(nn.Module):
         self.mlp = self._make_mlp()
 
     def _make_feature_extractor(self):
-        in_channels, in_h, in_w, = tuple(self.in_size)
+        (
+            in_channels,
+            in_h,
+            in_w,
+        ) = tuple(self.in_size)
 
         layers = []
         # TODO: Create the feature extractor part of the model:
@@ -81,9 +85,9 @@ class CNN(nn.Module):
         #  CONV->ACTs should exist at the end, without a POOL after them.
         # ====== YOUR CODE: ======
         for i in range(len(self.channels)):
-            layers.append(nn.Conv2d(in_channels,self.channels[i],**self.conv_params))
+            layers.append(nn.Conv2d(in_channels, self.channels[i], **self.conv_params))
             layers.append(ACTIVATIONS[self.activation_type](**self.activation_params))
-            if(((i+1) % self.pool_every) == 0):
+            if ((i + 1) % self.pool_every) == 0:
                 layers.append(POOLINGS[self.pooling_type](**self.pooling_params))
             in_channels = self.channels[i]
 
@@ -111,8 +115,10 @@ class CNN(nn.Module):
         #    convolutional features extracted by the convolutional layers.
         #  - The last Linear layer should have an output dim of out_classes.
         dims = self.hidden_dims + [self.out_classes]
-        non_lins = [ACTIVATIONS[self.activation_type](**self.activation_params)] * (len(dims)-1)+ [nn.Identity()]
-        mlp: MLP = MLP(in_dim=self._n_features(), dims= dims , nonlins = non_lins)        
+        non_lins = [ACTIVATIONS[self.activation_type](**self.activation_params)] * (
+            len(dims) - 1
+        ) + [nn.Identity()]
+        mlp: MLP = MLP(in_dim=self._n_features(), dims=dims, nonlins=non_lins)
         return mlp
 
     def forward(self, x: Tensor):
@@ -166,31 +172,37 @@ class ResidualBlock(nn.Module):
         if activation_type not in ACTIVATIONS:
             raise ValueError("Unsupported activation type")
 
-        self.main_path, self.shortcut_path = None, None
+        self.main_path = []
+        original_in_channels = in_channels
+        conv_num = 1
+        for out_channels, kernel_size in zip(channels, kernel_sizes):
+            self.main_path.append(
+                nn.Conv2d(in_channels, out_channels, kernel_size, padding="same")
+            )
+            if conv_num < len(channels):
+                if dropout > 0:
+                    self.main_path.append(nn.Dropout2d(dropout))
+                if batchnorm:
+                    self.main_path.append(nn.BatchNorm2d(out_channels))
+                if conv_num < len(channels):
+                    self.main_path.append(
+                        ACTIVATIONS[activation_type](**activation_params)
+                    )
+            in_channels = out_channels
+            conv_num += 1
+        self.main_path = nn.Sequential(*self.main_path)
 
-        # TODO: Implement a generic residual block.
-        #  Use the given arguments to create two nn.Sequentials:
-        #  - main_path, which should contain the convolution, dropout,
-        #    batchnorm, relu sequences (in this order).
-        #    Should end with a final conv as in the diagram.
-        #  - shortcut_path which should represent the skip-connection and
-        #    may contain a 1x1 conv.
-        #  Notes:
-        #  - Use convolutions which preserve the spatial extent of the input.
-        #  - Use bias in the main_path conv layers, and no bias in the skips.
-        #  - For simplicity of implementation, assume kernel sizes are odd.
-        #  - Don't create layers which you don't use! This will prevent
-        #    correct comparison in the test.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        self.shortcut_path = [nn.Identity()]
+        if original_in_channels != channels[-1]:
+            self.shortcut_path.append(
+                nn.Conv2d(original_in_channels, channels[-1], 1, bias=False)
+            )
+        self.shortcut_path = nn.Sequential(*self.shortcut_path)
 
     def forward(self, x: Tensor):
-        # TODO: Implement the forward pass. Save the main and residual path to `out`.
-        out: Tensor = None
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        out = self.main_path(x)
+        shortcut = self.shortcut_path(x)
+        out += shortcut
         out = torch.relu(out)
         return out
 
@@ -217,7 +229,7 @@ class ResidualBottleneckBlock(ResidualBlock):
             block input and output convolutions.
             For example, if in_out_channels=10 and inner_channels=[5],
             the block will have three convolutions, with channels 10->5->5->10.
-            The first and last arrows are the 1X1 projection convolutions, 
+            The first and last arrows are the 1X1 projection convolutions,
             and the middle one is the inner convolution (corresponding to the kernel size listed in "inner kernel sizes").
         :param inner_kernel_sizes: List of kernel sizes (spatial) for the internal
             convolutions in the block. Length should be the same as inner_channels.
@@ -226,14 +238,13 @@ class ResidualBottleneckBlock(ResidualBlock):
         """
         assert len(inner_channels) > 0
         assert len(inner_channels) == len(inner_kernel_sizes)
-
-        # TODO:
-        #  Initialize the base class in the right way to produce the bottleneck block
-        #  architecture.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
-
+        
+        super().__init__(
+            in_channels=in_out_channels,
+            channels=[inner_channels[0], *inner_channels, in_out_channels],
+            kernel_sizes=[1, *inner_kernel_sizes, 1],
+            **kwargs,
+        )
 
 class ResNet(CNN):
     def __init__(
@@ -261,7 +272,11 @@ class ResNet(CNN):
         )
 
     def _make_feature_extractor(self):
-        in_channels, in_h, in_w, = tuple(self.in_size)
+        (
+            in_channels,
+            in_h,
+            in_w,
+        ) = tuple(self.in_size)
 
         layers = []
         # TODO: Create the feature extractor part of the model:
@@ -284,4 +299,3 @@ class ResNet(CNN):
         # ========================
         seq = nn.Sequential(*layers)
         return seq
-

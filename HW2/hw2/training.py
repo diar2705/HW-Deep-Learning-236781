@@ -246,14 +246,14 @@ class ClassifierTrainer(Trainer):
         batch_loss: float
         num_correct: int
 
-        # TODO: Train the model on one batch of data.
-        #  - Forward pass
-        #  - Backward pass
-        #  - Update parameters
-        #  - Classify and calculate number of correct predictions
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        self.optimizer.zero_grad()
+        
+        out = self.model(X)
+        batch_loss = self.loss_fn(out, y)
+        batch_loss.backward()
+        self.optimizer.step()
+        num_correct = (out.argmax(dim=1) == y).sum().item()
+        batch_loss = batch_loss.item()
 
         return BatchResult(batch_loss, num_correct)
 
@@ -268,12 +268,9 @@ class ClassifierTrainer(Trainer):
         num_correct: int
 
         with torch.no_grad():
-            # TODO: Evaluate the model on one batch of data.
-            #  - Forward pass
-            #  - Calculate number of correct predictions
-            # ====== YOUR CODE: ======
-            raise NotImplementedError()
-            # ========================
+            out = self.model(X)
+            batch_loss = self.loss_fn(out, y).item()
+            num_correct = (out.argmax(dim=1) == y).sum().item()
 
         return BatchResult(batch_loss, num_correct)
 

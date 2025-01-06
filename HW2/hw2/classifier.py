@@ -21,21 +21,14 @@ class Classifier(nn.Module, ABC):
         self.model = model
 
         # TODO: Add any additional initializations here, if you need them.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+
 
     def forward(self, x: Tensor) -> Tensor:
         """
         :param x: (N, D) input tensor, N samples with D features
         :returns: (N, C) i.e. C class scores for each of N samples
         """
-        z: Tensor = None
-
-        # TODO: Implement the forward pass, returning raw scores from the wrapped model.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        z = self.model(x)
         assert z.shape[0] == x.shape[0] and z.ndim == 2, "raw scores should be (N, C)"
         return z
 
@@ -45,10 +38,7 @@ class Classifier(nn.Module, ABC):
         :returns: (N, C) i.e. C probability values between 0 and 1 for each of N
             samples.
         """
-        # TODO: Calcualtes class scores for each sample.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        z = self.forward(x)
         return self.predict_proba_scores(z)
 
     def predict_proba_scores(self, z: Tensor) -> Tensor:
@@ -57,10 +47,7 @@ class Classifier(nn.Module, ABC):
         :returns: (N, C) i.e. C probability values between 0 and 1 for each of N
             samples.
         """
-        # TODO: Calculate class probabilities for the input.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        return torch.softmax(z, dim=1)
 
     def classify(self, x: Tensor) -> Tensor:
         """
@@ -92,12 +79,7 @@ class ArgMaxClassifier(Classifier):
     """
 
     def _classify(self, y_proba: Tensor):
-        # TODO:
-        #  Classify each sample to one of C classes based on the highest score.
-        #  Output should be a (N,) integer tensor.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        return torch.argmax(y_proba, dim=1)
 
 
 class BinaryClassifier(Classifier):
