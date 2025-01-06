@@ -80,7 +80,12 @@ class CNN(nn.Module):
         #  Note: If N is not divisible by P, then N mod P additional
         #  CONV->ACTs should exist at the end, without a POOL after them.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        for i in range(len(self.channels)):
+            layers.append(nn.Conv2d(in_channels,self.channels[i],**self.conv_params))
+            layers.append(ACTIVATIONS[self.activation_type](**self.activation_params))
+            if(((i+1) % self.pool_every) == 0):
+                layers.append(POOLINGS[self.pooling_type](**self.pooling_params))
+            in_channels = self.channels[i]
 
         # ========================
         seq = nn.Sequential(*layers)
@@ -94,9 +99,7 @@ class CNN(nn.Module):
         # Make sure to not mess up the random state.
         rng_state = torch.get_rng_state()
         try:
-            # ====== YOUR CODE: ======
-            raise NotImplementedError()
-            # ========================
+            return self.feature_extractor(torch.zeros(1, *self.in_size)).numel()
         finally:
             torch.set_rng_state(rng_state)
 
@@ -107,10 +110,9 @@ class CNN(nn.Module):
         #  - The first Linear layer should have an input dim of equal to the number of
         #    convolutional features extracted by the convolutional layers.
         #  - The last Linear layer should have an output dim of out_classes.
-        mlp: MLP = None
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        dims = self.hidden_dims + [self.out_classes]
+        non_lins = [ACTIVATIONS[self.activation_type](**self.activation_params)] * (len(dims)-1)+ [nn.Identity()]
+        mlp: MLP = MLP(in_dim=self._n_features(), dims= dims , nonlins = non_lins)        
         return mlp
 
     def forward(self, x: Tensor):
@@ -119,7 +121,8 @@ class CNN(nn.Module):
         #  return class scores.
         out: Tensor = None
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        out_conv = self.feature_extractor(x)
+        out = self.mlp(out_conv.view(out_conv.shape[0], -1))
         # ========================
         return out
 
