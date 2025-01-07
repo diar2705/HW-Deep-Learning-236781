@@ -75,15 +75,6 @@ class CNN(nn.Module):
         ) = tuple(self.in_size)
 
         layers = []
-        # TODO: Create the feature extractor part of the model:
-        #  [(CONV -> ACT)*P -> POOL]*(N/P)
-        #  Apply activation function after each conv, using the activation type and
-        #  parameters.
-        #  Apply pooling to reduce dimensions after every P convolutions, using the
-        #  pooling type and pooling parameters.
-        #  Note: If N is not divisible by P, then N mod P additional
-        #  CONV->ACTs should exist at the end, without a POOL after them.
-        # ====== YOUR CODE: ======
         for i in range(len(self.channels)):
             layers.append(nn.Conv2d(in_channels, self.channels[i], **self.conv_params))
             layers.append(ACTIVATIONS[self.activation_type](**self.activation_params))
@@ -108,12 +99,6 @@ class CNN(nn.Module):
             torch.set_rng_state(rng_state)
 
     def _make_mlp(self):
-        # TODO:
-        #  - Create the MLP part of the model: (FC -> ACT)*M -> Linear
-        #  - Use the the MLP implementation from Part 1.
-        #  - The first Linear layer should have an input dim of equal to the number of
-        #    convolutional features extracted by the convolutional layers.
-        #  - The last Linear layer should have an output dim of out_classes.
         dims = self.hidden_dims + [self.out_classes]
         non_lins = [ACTIVATIONS[self.activation_type](**self.activation_params)] * (
             len(dims) - 1
@@ -122,14 +107,9 @@ class CNN(nn.Module):
         return mlp
 
     def forward(self, x: Tensor):
-        # TODO: Implement the forward pass.
-        #  Extract features from the input, run the classifier on them and
-        #  return class scores.
         out: Tensor = None
-        # ====== YOUR CODE: ======
         out_conv = self.feature_extractor(x)
         out = self.mlp(out_conv.view(out_conv.shape[0], -1))
-        # ========================
         return out
 
 
@@ -238,13 +218,14 @@ class ResidualBottleneckBlock(ResidualBlock):
         """
         assert len(inner_channels) > 0
         assert len(inner_channels) == len(inner_kernel_sizes)
-        
+
         super().__init__(
             in_channels=in_out_channels,
             channels=[inner_channels[0], *inner_channels, in_out_channels],
             kernel_sizes=[1, *inner_kernel_sizes, 1],
             **kwargs,
         )
+
 
 class ResNet(CNN):
     def __init__(
@@ -278,7 +259,6 @@ class ResNet(CNN):
             in_w,
         ) = tuple(self.in_size)
 
-        layers = []
         # TODO: Create the feature extractor part of the model:
         #  [-> (CONV -> ACT)*P -> POOL]*(N/P)
         #   \------- SKIP ------/
@@ -295,7 +275,67 @@ class ResNet(CNN):
         #    2 + len(inner_channels). [1 for each 1X1 proection convolution] + [# inner convolutions].
         # - Use batchnorm and dropout as requested.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        layers = []
+        N = len(self.channels)
+        P = self.pool_every
+        for p in range(N // P):
+            kernel_sizes = [3] * P
+            channels = self.channels[p * P : (p + 1) * P]
+            if self.bottleneck and in_channels == channels[-1]:
+                layers.append(
+                    ResidualBottleneckBlock(
+                        in_out_channels=in_channels,
+                        inner_channels=channels[1:-1],
+                        inner_kernel_sizes=kernel_sizes[1:-1],
+                        batchnorm=self.batchnorm,
+                        dropout=self.dropout,
+                        activation_type=self.activation_type,
+                        activation_params=self.activation_params,
+                    )
+                )
+            else:
+                layers.append(
+                    ResidualBlock(
+                        in_channels=in_channels,
+                        channels=self.channels[p * P : (p + 1) * P],
+                        kernel_sizes=[3] * P,
+                        batchnorm=self.batchnorm,
+                        dropout=self.dropout,
+                        activation_type=self.activation_type,
+                        activation_params=self.activation_params,
+                    )
+                )
+            layers.append(POOLINGS[self.pooling_type](**self.pooling_params))
+            in_channels = channels[-1]
+        
+        if N % P != 0:
+            kernel_sizes = [3] * (N % P)
+            channels = self.channels[(N // P) * P:]
+            if self.bottleneck and in_channels == channels[-1]:
+                layers.append(
+                    ResidualBottleneckBlock(
+                        in_out_channels=in_channels,
+                        inner_channels=channels[1:-1],
+                        inner_kernel_sizes=kernel_sizes[1:-1],
+                        batchnorm=self.batchnorm,
+                        dropout=self.dropout,
+                        activation_type=self.activation_type,
+                        activation_params=self.activation_params,
+                    )
+                )
+            else:
+                layers.append(
+                    ResidualBlock(
+                        in_channels=in_channels,
+                        channels=channels,
+                        kernel_sizes=kernel_sizes,
+                        batchnorm=self.batchnorm,
+                        dropout=self.dropout,
+                        activation_type=self.activation_type,
+                        activation_params=self.activation_params,
+                    )
+                )
+
         # ========================
         seq = nn.Sequential(*layers)
         return seq
