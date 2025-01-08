@@ -259,22 +259,6 @@ class ResNet(CNN):
             in_w,
         ) = tuple(self.in_size)
 
-        # TODO: Create the feature extractor part of the model:
-        #  [-> (CONV -> ACT)*P -> POOL]*(N/P)
-        #   \------- SKIP ------/
-        #  For the ResidualBlocks, use only dimension-preserving 3x3 convolutions (make sure to use the right stride and padding).
-        #  Apply Pooling to reduce dimensions after every P convolutions.
-        #  Notes:
-        #  - If N is not divisible by P, then N mod P additional
-        #    CONV->ACT (with a skip over them) should exist at the end,
-        #    without a POOL after them.
-        #  - Use your own ResidualBlock implementation.
-        #  - Use bottleneck blocks if requested and if the number of input and output
-        #    channels match for each group of P convolutions.
-        #    Reminder: the number of convolutions performed in the bottleneck block is:
-        #    2 + len(inner_channels). [1 for each 1X1 proection convolution] + [# inner convolutions].
-        # - Use batchnorm and dropout as requested.
-        # ====== YOUR CODE: ======
         layers = []
         N = len(self.channels)
         P = self.pool_every
@@ -335,7 +319,5 @@ class ResNet(CNN):
                         activation_params=self.activation_params,
                     )
                 )
-
-        # ========================
         seq = nn.Sequential(*layers)
         return seq

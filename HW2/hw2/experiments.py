@@ -25,31 +25,6 @@ MODEL_TYPES = {
 }
 
 
-def mlp_experiment(
-    depth: int,
-    width: int,
-    dl_train: DataLoader,
-    dl_valid: DataLoader,
-    dl_test: DataLoader,
-    n_epochs: int,
-):
-    # TODO:
-    #  - Create a BinaryClassifier model.
-    #  - Train using our ClassifierTrainer for n_epochs, while validating on the
-    #    validation set.
-    #  - Use the validation set for threshold selection.
-    #  - Set optimal threshold and evaluate one epoch on the test set.
-    #  - Return the model, the optimal threshold value, the accuracy on the validation
-    #    set (from the last epoch) and the accuracy on the test set (from a single
-    #    epoch).
-    #  Note: use print_every=0, verbose=False, plot=False where relevant to prevent
-    #  output from this function.
-    # ====== YOUR CODE: ======
-    raise NotImplementedError()
-    # ========================
-    return model, thresh, valid_acc, test_acc
-
-
 def cnn_experiment(
     run_name,
     out_dir="./results",
@@ -80,7 +55,7 @@ def cnn_experiment(
     See the help string of each parameter for it's meaning.
     """
     if not seed:
-        seed = random.randint(0, 2 ** 31)
+        seed = random.randint(0, 2**31)
     torch.manual_seed(seed)
     if not bs_test:
         bs_test = max([bs_train // 4, 1])
@@ -98,17 +73,41 @@ def cnn_experiment(
         raise ValueError(f"Unknown model type: {model_type}")
     model_cls = MODEL_TYPES[model_type]
 
-    # TODO: Train
-    #  - Create model, loss, optimizer and trainer based on the parameters.
-    #    Use the model you've implemented previously, cross entropy loss and
-    #    any optimizer that you wish.
-    #  - Run training and save the FitResults in the fit_res variable.
-    #  - The fit results and all the experiment parameters will then be saved
-    #   for you automatically.
-    fit_res = None
-    # ====== YOUR CODE: ======
-    raise NotImplementedError()
-    # ========================
+    dl_train = torch.utils.data.DataLoader(ds_train, bs_train, shuffle=False)
+    dl_test = torch.utils.data.DataLoader(ds_test, bs_test, shuffle=False)
+    channels = [item for item in filters_per_layer for _ in range(layers_per_block)]
+    additional_params = {}
+    if model_type == "resnet":
+        additional_params = {"batchnorm": True, "dropout": 0.1, "bottleneck": False}
+    model = model_cls(
+        in_size=ds_train[0][0].shape,
+        out_classes=10,
+        channels=channels,
+        pool_every=pool_every,
+        hidden_dims=hidden_dims,
+        conv_params={"kernel_size": 3, "stride": 1, "padding": 1},
+        activation_type="relu",
+        pooling_type="max",
+        pooling_params={"kernel_size": 2},
+        **additional_params,
+    )
+
+    loss_fn = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=reg)
+    classifier = ArgMaxClassifier(model=model)
+    trainer = ClassifierTrainer(
+        model=classifier, optimizer=optimizer, device=device, loss_fn=loss_fn
+    )
+
+    fit_res = trainer.fit(
+        dl_train,
+        dl_test,
+        num_epochs=epochs,
+        max_batches=batches,
+        early_stopping=early_stopping,
+        checkpoints=checkpoints,
+        print_every=1,
+    )
 
     save_experiment(run_name, out_dir, cfg, fit_res)
 

@@ -66,11 +66,10 @@ class Trainer(abc.ABC):
         """
 
         actual_num_epochs = 0
-        epochs_without_improvement = 0
 
         train_loss, train_acc, test_loss, test_acc = [], [], [], []
         best_acc = None
-
+        counter_for_exit = 0
         for epoch in range(num_epochs):
             verbose = False  # pass this to train/test_epoch.
             if print_every > 0 and (
@@ -87,8 +86,9 @@ class Trainer(abc.ABC):
             test_loss.append(sum(loss_test_e) / len(loss_test_e))
             test_acc.append(acc_test_e)            
             
-            counter_for_exit = 0
+            
             if best_acc is None or acc_test_e > best_acc:
+                best_acc = acc_test_e
                 counter_for_exit = 0
                 self.save_checkpoint(f"{checkpoints}")
             else:
