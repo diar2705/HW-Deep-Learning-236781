@@ -8,19 +8,18 @@ L1_values=(2 4 8)
 for K in "${K1_values[@]}"; do
   for L in "${L1_values[@]}"; do
     # Construct the --run-name dynamically
-    RUN_NAME="exp1_1_L${L}_K${K}"
+    RUN_NAME="exp1_1"
     
     # Run the srun command
-    srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -K "$K" -L "$L" -P 2 -H 100 --run-name "$RUN_NAME" -M cnn
+    srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -K "$K" -L "$L" -P 2 -H 100 --run-name "$RUN_NAME" -M cnn --early-stopping 10
   done
 done
 
 for K in "${K1_values[@]}"; do
-    RUN_NAME="exp1_1_L16_K${K}"
+    RUN_NAME="exp1_1"
     
     # Run the srun command
-    srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -K "$K" -L 16 -P 4 -H 100 --run-name "$RUN_NAME" -M cnn
-  done
+    srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -K "$K" -L 16 -P 4 -H 100 --run-name "$RUN_NAME" -M cnn --early-stopping 10
 done
 
 
@@ -32,10 +31,10 @@ L2_values=(2 4 8)
 for L in "${L2_values[@]}"; do
     for K in "${K2_values[@]}"; do
     # Construct the --run-name dynamically
-    RUN_NAME="exp1_2_L${L}_K${K}"
+    RUN_NAME="exp1_2"
     
     # Run the srun command
-    srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -K "$K" -L "$L" -P 2 -H 100 --run-name "$RUN_NAME" -M cnn
+    srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -K "$K" -L "$L" -P 2 -H 100 --run-name "$RUN_NAME" -M cnn --early-stopping 10
   done
 done
 
@@ -46,9 +45,9 @@ L3_values=(2 3 4)
 # Loop through each combination of -K and -L
 for L in "${L3_values[@]}"; do
     # Construct the --run-name dynamically
-    RUN_NAME="exp1_3_L${L}_K64-128"
+    RUN_NAME="exp1_3"
     
     # Run the srun command
-    srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -K 64 128 -L "$L" -P 2 -H 100 --run-name "$RUN_NAME" -M cnn
+    srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -K 64 128 -L "$L" -P 2 -H 100 --run-name "$RUN_NAME" -M cnn --early-stopping 10 
 done
 
