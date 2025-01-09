@@ -90,10 +90,11 @@ class Trainer(abc.ABC):
             if best_acc is None or acc_test_e > best_acc:
                 best_acc = acc_test_e
                 counter_for_exit = 0
-                self.save_checkpoint(f"{checkpoints}")
+                if checkpoints:
+                    self.save_checkpoint(f"{checkpoints}")
             else:
                 counter_for_exit += 1
-                if(counter_for_exit > early_stopping):
+                if early_stopping and counter_for_exit > early_stopping:
                     break
 
         return FitResult(actual_num_epochs, train_loss, train_acc, test_loss, test_acc)
