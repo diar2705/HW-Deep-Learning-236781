@@ -212,9 +212,10 @@ Memory usage grows linearly with the number of batches, leading to an out-of-mem
 
 part2_q4 = r"""
 **Answer:**
-1.A. We can use a technique called checkpointing, the algorithm initializes two variables currentGradient and currentResult and proceeds with a forward pass through the computational graph. At each step, it computes the derivative of the current function, updating both the gradient and the result accordingly. By only keeping track of the gradient and the result at each point, the memory complexity is reduced to $O(1)$, effectively minimizing the memory footprint. However, in cases where the intermediate results are not pre-stored or readily available, the memory complexity increases to $O(n)$, as it becomes necessary to store all intermediate values to ensure accurate gradient computation.
+1. 
 
-1.B. We can also use checkpointing here, the algorithm initializestwo variables backwardGradient and backwardResult are initialized, and a forward pass through the computational graph is performed, during which the intermediate results of the functions are saved. Then, in the backward pass, the algorithm iterates from the output to the input, calculating the gradients based on the previously saved function results. By only retaining the essential function results required for gradient computation, the memory complexity is reduced to $O(1)$, minimizing memory usage while still maintaining the accuracy of the gradient calculation.
+- We can use a technique called checkpointing, the algorithm initializes two variables currentGradient and currentResult and proceeds with a forward pass through the computational graph. At each step, it computes the derivative of the current function, updating both the gradient and the result accordingly. By only keeping track of the gradient and the result at each point, the memory complexity is reduced to $O(1)$, effectively minimizing the memory footprint. However, in cases where the intermediate results are not pre-stored or readily available, the memory complexity increases to $O(n)$, as it becomes necessary to store all intermediate values to ensure accurate gradient computation.
+- We can also use checkpointing here, the algorithm initializestwo variables backwardGradient and backwardResult are initialized, and a forward pass through the computational graph is performed, during which the intermediate results of the functions are saved. Then, in the backward pass, the algorithm iterates from the output to the input, calculating the gradients based on the previously saved function results. By only retaining the essential function results required for gradient computation, the memory complexity is reduced to $O(1)$, minimizing memory usage while still maintaining the accuracy of the gradient calculation.
 
 2. Initially, for a computational graph with multiple input nodes, we would need two variables per input node, leading to $O(n)$ memory complexity. However, by traversing the graph from input to output for each gradient element, we can reduce memory complexity to $O(1)$. The drawback is that this approach isn't suitable for parallel computation, as it requires storing multiple sets of intermediate results, returning the memory complexity to $O(n)$.
 
@@ -500,7 +501,8 @@ part6_q1 = r"""
     As for a solution, we can train the model on more data and much more diverse pictures, 
     and maybe switch to a better model that dosen't have limitations like YOLOv5 might have.
     
-3.  #TODO
+3.  If for example we want to make YOLO misclassify, we can iteratively modify the input image by calculating gradients of the loss with respect to the image and applying small updates in the direction that increases misclassification.
+    These updates are constrained within a set bound to ensure the perturbation remains imperceptible to humans. 
 
 """
 
@@ -524,18 +526,17 @@ part6_q3 = r"""
 The model didn't do well at all, as it couldn't detect anything.
 - For the first pic, the problem probably is that the leaves are apstracting the face of the monkey, making it hard to understand what is there in the pic.
 - For the second one, the problem is for sure the blurry face and background.
-- And for the last pic, the problem is the lighting for sure, as the model most definitely didn't see that cat there.
+- And for the last pic, the problem is the lighting for sure, as the model most definitely didn't understand that these is a person standing there.
 """
 
 part6_bonus = r"""
-**Your answer:**
-#TODO
+**Answer:**
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+- For the monkey image we used AI to remove leaves abstracting the monkey's face, and then it detected a bird, it didn't classify a monkey
+but it's still better than before.
+- For the dog image, we filtered the image using the filter in the code above, and again, it misclassified the dog to a cat, 
+but still better than before.
+- And for the man image, we brightened up the image using the filter in the code above, and now YOLO got it right!! it said that this is a person.
+
 
 """
