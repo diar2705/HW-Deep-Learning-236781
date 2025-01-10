@@ -380,26 +380,33 @@ part4_q1 = r"""
 part5_q1 = r"""
 **Your answer:**
 
+**1:**
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
 
+Analyzing the graphs, it is evident that increasing the network depth led to a decrease in accuracy,
+with the shallowest depth of 2 yielding the best results for both k=32 and k=64.
+This could be attributed to overfitting: while deeper networks are capable of learning more complex patterns, 
+they are also more susceptible to overfitting, especially on limited or noisy datasets. 
+A depth of 2 may have been sufficient to capture the relevant features of the data without introducing excessive complexity. 
+By avoiding deeper architectures, the network likely reduced the risk of overfitting, thereby achieving better generalization performance.
+
+
+**2:**
+
+In our experiment, we encountered instances where the network became non-trainable for values of 
+$\mathbf{L}=8$ and $\mathbf{L}=16$. This issue is likely caused by the vanishing gradient problem or unstable gradients during training. 
+As the depth of the network increases, the gradients used to update weights during backpropagation may diminish or explode,
+making it difficult for the network to learn effectively.
+to resolve this partially we can add Batch Normalization layers that helps normalize the input to each layer, 
+stabilizing the training process and preventing gradients from vanishing or exploding.
+other solution may be to incorporate residual connections (as used in ResNet architectures), 
+which allow gradients to bypass certain layers and flow more directly through the network, mitigating the vanishing gradient problem.
 """
 
 part5_q2 = r"""
 **Your answer:**
 
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
 
 """
 
@@ -407,12 +414,6 @@ part5_q3 = r"""
 **Your answer:**
 
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
 
 """
 
@@ -420,12 +421,7 @@ part5_q4 = r"""
 **Your answer:**
 
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+
 
 """
 
