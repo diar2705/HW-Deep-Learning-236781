@@ -406,13 +406,24 @@ which allow gradients to bypass certain layers and flow more directly through th
 part5_q2 = r"""
 **Your answer:**
 
+The analysis of the graphs shows that for fixed values of L (specifically L=2 and L=4),
+increasing K leads to higher training and test accuracies, a trend more pronounced than in experiment 1_1. 
+However, L=8 results very low accuracies across all K values, indicating non-trainability when L exceeds 4.
+The configuration that achieved the best results is L=2, K=64, same as experiment 1_1.
 
+Overall, while increasing K improves accuracy for L=2 and L=4, L=8 remains consistently poor.
 
 """
 
 part5_q3 = r"""
 **Your answer:**
 
+Upon examining the graphs, it becomes clear that the model's performance changes with varying depths ($\mathbf{L}$). 
+Notably, in this experiment, $\mathbf{L} = 3$, representing the second shallowest depth, achieves the highest test accuracy. 
+This indicates that a moderate network depth is most effective for achieving optimal accuracy.
+we can see that unlike previouus expirments where $\mathbf{L}$ > 4 made the network non-trainable , 
+here $\mathbf{L}$ = 4 makes the network non-trainable, The failure to train effectively at $\mathbf{L}$ = 4 
+implies that gradients are vanishing as they propagate back through the deeper layers of the network.
 
 
 """
