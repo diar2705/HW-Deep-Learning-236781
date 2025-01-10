@@ -12,25 +12,80 @@ part1_q1 = r"""
 **Your answer:**
 
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+**1.A:**
+
+The output $\mathbf{Y}$ has a shape of $(N, \text{out\_features}) = (64, 512)$, 
+and the input $\mathbf{X}$ has a shape of $(N, \text{in\_features}) = (64, 1024)$. 
+For the Jacobian tensor $\mathbf{\frac{\partial \mathbf{Y}}{\partial \mathbf{X}}}$, we need to consider the partial derivatives 
+of each element in $\mathbf{Y}$ with respect to each element in $\mathbf{X}$. so the shape is:
+
+$$(N, \text{out\_features}, N, \text{in\_features}) = (64, 512, 64, 1024)$$
+
+**1.B:**
+
+Yes, the Jacobian $\mathbf{\frac{\partial \mathbf{Y}}{\partial \mathbf{X}}}$ is sparse. 
+Each output vector $\mathbf{Y}[n]$ depends only on the corresponding input vector $\mathbf{X}[n]$. 
+Thus, for $n \neq m$, the partial derivatives $\frac{\partial \mathbf{Y}[n]}{\partial \mathbf{X}[m]} = 0$. 
+Only the diagonal terms $\frac{\partial \mathbf{Y}[n]}{\partial \mathbf{X}[n]}$ are non-zero.
+
+
+**1.C:**
+
+No, we do not need to materialize the Jacobian. Instead, we can compute $\delta \mathbf{X}$ 
+(the gradient of the loss with respect to $\mathbf{X}$) using matrix multiplication. 
+Given $\delta \mathbf{Y} = \frac{\partial L}{\partial \mathbf{Y}}$, the gradient is:
+
+$$\delta \mathbf{X} = \frac{\partial L}{\partial \mathbf{X}} = \frac{\partial L}{\partial \mathbf{Y}} \cdot \mathbf{W}^\top = \delta \mathbf{Y} \cdot \mathbf{W}^\top$$
+
+This avoids explicitly constructing the Jacobian.
+
+
+**2.A:**
+
+The output $\mathbf{Y}$ has a shape of $(N, \text{out\_features}) = (64, 512)$, 
+and the weight $\mathbf{W}$ has a shape of $(\text{out\_features}, \text{in\_features}) = (512, 1024)$. 
+For The Jacobian tensor $\frac{\partial \mathbf{Y}}{\partial \mathbf{W}}$ we need to consider the partial derivatives 
+of each element in $\mathbf{Y}$ with respect to each element in $\mathbf{W}$ . so the shape is:
+
+
+$$(N, \text{out\_features}, \text{out\_features}, \text{in\_features}) = (64, 512, 512, 1024)$$
+
+
+**2.B:**
+
+No, the Jacobian $\frac{\partial \mathbf{Y}}{\partial \mathbf{W}}$ is not sparse. 
+Each element of $\mathbf{Y}$ depends on multiple elements of $\mathbf{W}$, 
+as the output of a fully connected layer is computed as $\mathbf{Y} = \mathbf{X} \cdot \mathbf{W}^\top$.
+
+
+**2.C:**
+
+No, we do not need to materialize the Jacobian. Instead, we can compute $\delta \mathbf{W}$ 
+(the gradient of the loss with respect to $\mathbf{W}$) using matrix multiplication. 
+Given $\delta \mathbf{Y} = \frac{\partial L}{\partial \mathbf{Y}}$, the gradient is:
+
+$$\delta \mathbf{W}= \frac{\partial L}{\partial \mathbf{W}} =
+\frac{\partial L}{\partial \mathbf{Y}} \cdot \frac{\partial \mathbf{Y}}{\partial \mathbf{W}} = 
+\frac{\partial L}{\partial \mathbf{Y}} \cdot \mathbf{X}^T =
+\delta \mathbf{Y} \cdot \mathbf{X}^\top$$
+
+
+
+This avoids explicitly constructing the Jacobian.
+
+
 
 """
 
 part1_q2 = r"""
 **Your answer:**
 
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+Back-propagation is not required for training neural networks using gradient-based optimization,
+as alternatives like derivative-free optimization (e.g., Nelder-Mead) or finite difference methods can be used. However, 
+these approaches are typically inefficient and impractical for large-scale networks. Back-propagation leverages the chain rule,
+computational graphs, and automatic differentiation to compute gradients efficiently, making it crucial for modern deep learning. 
+While alternatives exist, back-propagation remains the most practical and widely used method due to its scalability, precision, 
+and computational effectiveness.
 
 """
 
@@ -190,39 +245,77 @@ def part3_optim_hp():
 part3_q1 = r"""
 **Your answer:**
 
+**1:**
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+High Optimization Error occurs when The model isn't learning the training data well enough ,
+i.e not minimizing the training loss effectively.
+This could be due to factors such as suboptimal optimization algorithms,
+low number of training epochs,or inadequate model complexity.
+To improve optimization,we should consider using advanced optimization algorithms,
+adjusting learning rates, increasing the number of training epochs, 
+or Enhance the network's capacity by increasing layers or the number of units per layer, 
+ensuring the model has a larger receptive field.
+
+
+**2:**
+
+This happens when the model performs well on the training data but fails to generalize effectively to unseen test data,
+which is a clear sign of overfitting. To improve this issue, 
+we can use regularization methods like L1/L2 regularization or dropout can be utilized to minimize overfitting. 
+Additionally, the model's capacity can be adjusted by decreasing the number of layers or neurons, 
+especially if the receptive field is excessively large for the problem at hand. 
+Increasing the variety within the training dataset is another effective way to enhance the model's ability to generalize.
+
+
+**3:**
+
+This occurs when the model is too simple to capture the data's complexity, leading to underfitting. 
+To improve this,we can use a more powerful hypothesis class like deep neural networks (DNNs) with additional parameters to model intricate patterns. 
+Introducing inductive bias, such as using convolutional neural networks (CNNs) for image tasks, tailors the model to the domain,
+improving its ability to learn relevant features and reducing approximation error.
+
+
 
 """
 
 part3_q2 = r"""
 **Your answer:**
 
+case expecting false positive rate (FPR) to be higher:
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+**Tumor classifier**: This might occur in a scenario where the classifier is designed to err on the side of caution,
+labeling benign tumors as malignant to ensure no possible cancer case is missed. 
+This would lead to more unnecessary follow-ups or biopsies but minimizes the risk of missing a potentially life-threatening diagnosis.
+
+
+case expecting false negative rate (FNR) to be higher:
+
+**Spam email classifier:**
+here false negative means A spam email is incorrectly identified as not spam and delivered to the inbox,
+and false positive means A legitimate email is incorrectly identified as spam and sent to the spam folder.
+Users are generally more tolerant of receiving a few extra spam emails in their inbox than missing important messages, 
+that means they expect that the false negative rate (FNR) to be higher and not the false positive rate.
+
 
 """
 
 part3_q3 = r"""
 **Your answer:**
 
+**1:** 
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+In this scenario, we should prioritize minimizing false positives. Since a false negative only means a delay in treatment (not a missed opportunity),
+we can tolerate a higher false negative rate. We would choose a point on the ROC curve that has a low FPR, even if it means a lower TPR.
+This means setting a higher threshold for our initial test, making it more stringent. This reduces the number of people sent for expensive testing.
+
+**2:**
+
+In this scenario, we must prioritize minimizing false negatives. Missing a case could be fatal. 
+We are willing to accept a higher false positive rate to ensure we catch as many true positives as possible. 
+We would choose a point on the ROC curve with a high TPR, even if it means a higher FPR.
+This means setting a lower threshold for our initial test, making it more sensitive.
+This will send more people for confirmatory testing, but it's a trade-off we must make to save lives.
+
 
 """
 
@@ -230,13 +323,12 @@ An equation: $e^{i\pi} -1 = 0$
 part3_q4 = r"""
 **Your answer:**
 
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+MLPs are bad at understanding sequntial data (like words in a sentence or events in time) because they treat each item separately.
+They don't remember what came before, so they miss the important connections between things in a sequence. 
+For example, an MLP wouldn't understand that "cat chases mouse" is different from "mouse chases cat" because it sees
+"cat," "chases," and "mouse" as separate, unrelated things. This makes them unsuitable for tasks where order matters, 
+like understanding text, translating languages, or recognizing speech.
+They're designed for single, independent inputs, not for analyzing patterns in ordered data.
 
 """
 # ==============
