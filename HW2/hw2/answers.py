@@ -431,7 +431,28 @@ implies that gradients are vanishing as they propagate back through the deeper l
 part5_q4 = r"""
 **Your answer:**
 
+with **K = 32**:
 
+The provided graph demonstrates that ResNet effectively addresses the underfitting challenges observed in previous CNN results.
+In the training accuracy plot, all ResNet configurations (L8, L16, and L32) exhibit smooth convergence, 
+with L8 achieving the fastest and highest training accuracy. This contrasts sharply with CNN,
+where deeper architectures were non-trainable due to vanishing or exploding gradients. 
+The test accuracy plot highlights ResNet's ability to generalize,
+as the L16 configuration achieves the best balance between training and test performance, 
+outperforming L8 (mild underfitting) and L32 (optimization challenges).
+Unlike the CNN, which struggled to learn meaningful representations,
+ResNet's residual connections stabilize gradient flow, enabling successful training even in deeper networks.
+
+
+with **K = 64-128-256**:
+
+
+The graph shows that the deeper ResNet model (L8) achieves the best training and test accuracy, 
+while shallower models (L2, L4) converge faster but underperform in both metrics.
+The L8 model's stable test accuracy above 60% demonstrates strong generalization, unlike L2, 
+which diverges and underfits. Compared to previous CNN results, which struggled with vanishing gradients and severe underfitting,
+ResNet effectively overcomes these issues using residual connections,
+enabling deeper architectures like L8 to train successfully and generalize well.
 
 
 """
