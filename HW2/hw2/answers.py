@@ -183,21 +183,42 @@ part2_q3 = r"""
     
     And because in deep learning we have huge datasets, thus SGD is preferred over GD.
     
-4. #TODO
-    A.  This approach can work, but only when our 
-        
+4. 
+A. The total loss is:
+
+$$
+L = \frac{1}{N} \sum_{i=1}^N \ell(f(x_i, \theta), y_i),
+$$
+
+where $\ell$ is the loss, $f(x_i, \theta)$ is the model's output, and $\theta$ represents parameters. The gradient of $ L $ is:
+
+$$
+\nabla_\theta L = \frac{1}{N} \sum_{i=1}^N \nabla_\theta \ell(f(x_i, \theta), y_i).
+$$
+
+If the dataset is split into $ M $ batches, with each batch loss $ L_j $, and the total loss is:
+
+$$
+L = \frac{1}{M} \sum_{j=1}^M L_j,
+$$
+
+Then the gradient $ \nabla_\theta L $ from summing batch losses is mathematically identical to GD. 
+
+
+B. Accumulating losses over all batches for a single backward pass requires storing computational graphs for all batches.
+Memory usage grows linearly with the number of batches, leading to an out-of-memory error.
+
 """
 
 part2_q4 = r"""
-**Your answer:**
-#TODO
+**Answer:**
+1.A. We can use a technique called checkpointing, the algorithm initializes two variables currentGradient and currentResult and proceeds with a forward pass through the computational graph. At each step, it computes the derivative of the current function, updating both the gradient and the result accordingly. By only keeping track of the gradient and the result at each point, the memory complexity is reduced to $O(1)$, effectively minimizing the memory footprint. However, in cases where the intermediate results are not pre-stored or readily available, the memory complexity increases to $O(n)$, as it becomes necessary to store all intermediate values to ensure accurate gradient computation.
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+1.B. We can also use checkpointing here, the algorithm initializestwo variables backwardGradient and backwardResult are initialized, and a forward pass through the computational graph is performed, during which the intermediate results of the functions are saved. Then, in the backward pass, the algorithm iterates from the output to the input, calculating the gradients based on the previously saved function results. By only retaining the essential function results required for gradient computation, the memory complexity is reduced to $O(1)$, minimizing memory usage while still maintaining the accuracy of the gradient calculation.
+
+2. Initially, for a computational graph with multiple input nodes, we would need two variables per input node, leading to $O(n)$ memory complexity. However, by traversing the graph from input to output for each gradient element, we can reduce memory complexity to $O(1)$. The drawback is that this approach isn't suitable for parallel computation, as it requires storing multiple sets of intermediate results, returning the memory complexity to $O(n)$.
+
+3. In deep architectures like VGGs and ResNets, which have numerous parameters and layers, memory optimization techniques provide significant benefits. These architectures typically demand high memory, but by reducing the memory complexity of gradient computation to $O(1)$, we can ease the memory load during training. This is particularly advantageous for training on hardware with limited memory. Moreover, the reduced memory complexity enhances training speed and scalability, leading to faster overall training for deep architectures.
 
 """
 
