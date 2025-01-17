@@ -18,13 +18,8 @@ def char_maps(text: str):
         represented by it. The reverse of the above map.
 
     """
-    # TODO:
-    #  Create two maps as described in the docstring above.
-    #  It's best if you also sort the chars before assigning indices, so that
-    #  they're in lexical order.
-    # ====== YOUR CODE: ======
-    raise NotImplementedError()
-    # ========================
+    char_to_idx = {char: idx for idx, char in enumerate(sorted(list(set(text))))}
+    idx_to_char = {idx: char for char, idx in char_to_idx.items()}
     return char_to_idx, idx_to_char
 
 
@@ -37,10 +32,9 @@ def remove_chars(text: str, chars_to_remove):
         - text_clean: the text after removing the chars.
         - n_removed: Number of chars removed.
     """
-    # TODO: Implement according to the docstring.
-    # ====== YOUR CODE: ======
-    raise NotImplementedError()
-    # ========================
+    chars_to_remove = set(chars_to_remove)
+    text_clean = "".join([char for char in text if char not in chars_to_remove])
+    n_removed = len(text) - len(text_clean)
     return text_clean, n_removed
 
 
@@ -57,10 +51,11 @@ def chars_to_onehot(text: str, char_to_idx: dict) -> Tensor:
     and D is the number of unique chars in the sequence. The dtype of the
     returned tensor will be torch.int8.
     """
-    # TODO: Implement the embedding.
-    # ====== YOUR CODE: ======
-    raise NotImplementedError()
-    # ========================
+    n = len(text)
+    v = len(char_to_idx)
+    result = torch.zeros(n, v, dtype=torch.int8)
+    for idx, char in enumerate(text):
+        result[idx, char_to_idx[char]] = 1
     return result
 
 
@@ -74,10 +69,8 @@ def onehot_to_chars(embedded_text: Tensor, idx_to_char: dict) -> str:
     :return: A string containing the text sequence represented by the
     embedding.
     """
-    # TODO: Implement the reverse-embedding.
-    # ====== YOUR CODE: ======
-    raise NotImplementedError()
-    # ========================
+    idx = torch.argmax(embedded_text, dim=1).tolist()
+    result = "".join([idx_to_char[i] for i in idx])
     return result
 
 
@@ -97,16 +90,14 @@ def chars_to_labelled_samples(text: str, char_to_idx: dict, seq_len: int, device
     the number of created samples, S is the seq_len and V is the embedding
     dimension.
     """
-    # TODO:
-    #  Implement the labelled samples creation.
-    #  1. Embed the given text.
-    #  2. Create the samples tensor by splitting to groups of seq_len.
-    #     Notice that the last char has no label, so don't use it.
-    #  3. Create the labels tensor in a similar way and convert to indices.
-    #  Note that no explicit loops are required to implement this function.
-    # ====== YOUR CODE: ======
-    raise NotImplementedError()
-    # ========================
+
+    N = len(text) // seq_len
+    S = seq_len
+    V = len(char_to_idx)
+    
+    embedded = chars_to_onehot(text[: S * N], char_to_idx)
+    samples = embedded.view((N, S, V)).to(device)
+    labels = torch.tensor([char_to_idx[c] for c in text[1: S * N + 1]], dtype=torch.long).view((N, S)).to(device)
     return samples, labels
 
 
@@ -180,18 +171,8 @@ class SequenceBatchSampler(torch.utils.data.Sampler):
         self.batch_size = batch_size
 
     def __iter__(self) -> Iterator[int]:
-        # TODO:
-        #  Return an iterator of indices, i.e. numbers in range(len(dataset)).
-        #  dataset and represents one  batch.
-        #  The indices must be generated in a way that ensures
-        #  that when a batch of size self.batch_size of indices is taken, samples in
-        #  the same index of adjacent batches are also adjacent in the dataset.
-        #  In the case when the last batch can't have batch_size samples,
-        #  you can drop it.
-        idx = None  # idx should be a 1-d list of indices.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        idx = torch.arange(len(self.dataset) // self.batch_size * self.batch_size)
+        idx = idx.view(self.batch_size, -1).t().flatten()
         return iter(idx)
 
     def __len__(self):
