@@ -110,10 +110,7 @@ def hot_softmax(y, dim=0, temperature=1.0):
     :param temperature: Temperature.
     :return: Softmax computed with the temperature parameter.
     """
-    # TODO: Implement based on the above.
-    # ====== YOUR CODE: ======
-    raise NotImplementedError()
-    # ========================
+    result = torch.softmax(y / temperature, dim=dim)
     return result
 
 
@@ -136,21 +133,16 @@ def generate_from_model(model, start_sequence, n_chars, char_maps, T):
     char_to_idx, idx_to_char = char_maps
     out_text = start_sequence
 
-    # TODO:
-    #  Implement char-by-char text generation.
-    #  1. Feed the start_sequence into the model.
-    #  2. Sample a new char from the output distribution of the last output
-    #     char. Convert output to probabilities first.
-    #     See torch.multinomial() for the sampling part.
-    #  3. Feed the new char into the model.
-    #  4. Rinse and Repeat.
-    #  Note that tracking tensor operations for gradient calculation is not
-    #  necessary for this. Best to disable tracking for speed.
-    #  See torch.no_grad().
-    # ====== YOUR CODE: ======
-    raise NotImplementedError()
-    # ========================
-
+    h = None
+    with torch.no_grad():
+        c = start_sequence
+        for _ in range(n_chars - len(start_sequence)):
+            x = chars_to_onehot(c, char_to_idx).unsqueeze(0).type(torch.FloatTensor).to(device)
+            y, h = model(x, h)
+            prob = hot_softmax(y[0, -1, :], temperature=T)
+            idx = torch.multinomial(prob, 1).item()
+            c = idx_to_char[idx]
+            out_text += c
     return out_text
 
 
@@ -202,11 +194,28 @@ class MultilayerGRU(nn.Module):
         self.n_layers = n_layers
         self.layer_params = []
 
-        # TODO: READ THIS SECTION!!
+        self.dropout = nn.Dropout(dropout) if dropout > 0 else None
+        self.sigmoid = nn.Sigmoid()
+        self.tanh = nn.Tanh()
+        
+        for l in range(n_layers):
+            layers = {}
+            layers["W_xz"] = nn.Linear(in_dim, h_dim, bias=False)
+            layers["W_xr"] = nn.Linear(in_dim, h_dim, bias=False)
+            layers["W_xg"] = nn.Linear(in_dim, h_dim, bias=False)
+            layers["W_hz"] = nn.Linear(h_dim, h_dim)
+            layers["W_hr"] = nn.Linear(h_dim, h_dim)
+            layers["W_hg"] = nn.Linear(h_dim, h_dim)
+            
+            self.layer_params.append(layers)
+            for k, v in layers.items():
+                self.add_module(f"{k}_{l}", v)
+            in_dim = h_dim
+        
+        out = nn.Linear(in_dim, out_dim)
+        self.layer_params.append(out)
+        self.add_module("out", out)
 
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
 
     def forward(self, input: Tensor, hidden_state: Tensor = None):
         """
@@ -235,11 +244,24 @@ class MultilayerGRU(nn.Module):
                 layer_states.append(hidden_state[:, i, :])
 
         layer_input = input
-        layer_output = None
-
-        # TODO: READ THIS SECTION!!
-        # ====== YOUR CODE: ======
-        # Loop over layers of the model
-        raise NotImplementedError()
-        # ========================
+        layer_output = torch.zeros_like(layer_input)
+        
+        for i in range(seq_len):
+            x = layer_input[:, i]
+            for j in  range(len(layer_states)):
+                h = layer_states[j]
+                W_xz, W_xr, W_xg, W_hz, W_hr, W_hg = self.layer_params[j].values()
+                
+                if j != 0:
+                    x = layer_states[j - 1]
+                z = self.sigmoid(W_xz(x) + W_hz(h))
+                r = self.sigmoid(W_xr(x) + W_hr(h))
+                g = self.tanh(W_xg(x) + W_hg(r * h))
+                
+                if j != 0:
+                    x = self.dropout(z * h + (1 - z) * g) if self.dropout is not None else z * h + (1 - z) * g
+                layer_states[j] = z * h + (1 - z) * g
+            layer_output[:, i] = self.layer_params[-1](layer_states[-1])
+        hidden_state = torch.stack(layer_states, dim=1)
+        
         return layer_output, hidden_state

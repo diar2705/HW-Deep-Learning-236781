@@ -86,19 +86,26 @@ class Trainer(abc.ABC):
                 verbose = True
             self._print(f"--- EPOCH {epoch+1}/{num_epochs} ---", verbose)
 
-            # TODO:
-            #  Train & evaluate for one epoch
-            #  - Use the train/test_epoch methods.
-            #  - Save losses and accuracies in the lists above.
-            #  - Implement early stopping. This is a very useful and
-            #    simple regularization technique that is highly recommended.
-            # ====== YOUR CODE: ======
+            train_result = self.train_epoch(dl_train, **kw)
+            test_result = self.test_epoch(dl_test, **kw)
+            actual_num_epochs += 1
+                    
+            train_loss.append(train_result.losses)
+            train_acc.append(train_result.accuracy)
             
-            raise NotImplementedError()
+            test_loss.append(test_result.losses)
+            test_acc.append(test_result.accuracy)            
+            
+            if best_acc is None or test_result.accuracy > best_acc:
+                best_acc = test_result.accuracy
+                epochs_without_improvement = 0
+                if checkpoints is not None:
+                    save_checkpoint = True
+            else:
+                epochs_without_improvement += 1
+                if early_stopping is not None and epochs_without_improvement > early_stopping:
+                    break
 
-            # ========================
-
-            # Save model checkpoint if requested
             if save_checkpoint and checkpoint_filename is not None:
                 saved_state = dict(
                     best_acc=best_acc,
@@ -221,19 +228,11 @@ class RNNTrainer(Trainer):
         super().__init__(model, loss_fn, optimizer, device)
 
     def train_epoch(self, dl_train: DataLoader, **kw):
-        # TODO: Implement modifications to the base method, if needed.
-        # ====== YOUR CODE: ======
-        
-        self.hidden_state = None    
-            
-        # ========================
+        self.hidden_state = None
         return super().train_epoch(dl_train, **kw)
 
     def test_epoch(self, dl_test: DataLoader, **kw):
-        # TODO: Implement modifications to the base method, if needed.
-        # ====== YOUR CODE: ======
         self.hidden_state = None   
-        # ========================
         return super().test_epoch(dl_test, **kw)
 
     def train_batch(self, batch) -> BatchResult:
@@ -241,20 +240,17 @@ class RNNTrainer(Trainer):
         x = x.to(self.device, dtype=torch.float)  # (B,S,V)
         y = y.to(self.device, dtype=torch.long)  # (B,S)
         seq_len = y.shape[1]
+        
+        out, self.hidden_state = self.model(x, self.hidden_state)
+        out_t = out.transpose(1, 2)
+        loss = self.loss_fn(out_t, y)
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+        self.hidden_state = self.hidden_state.detach()
+        y_pred = out_t.argmax(dim=1)
+        num_correct = (y_pred == y).sum()
 
-        # TODO:
-        #  Train the RNN model on one batch of data.
-        #  - Forward pass
-        #  - Calculate total loss over sequence
-        #  - Backward pass: truncated back-propagation through time
-        #  - Update params
-        #  - Calculate number of correct char predictions
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
-
-        # Note: scaling num_correct by seq_len because each sample has seq_len
-        # different predictions.
         return BatchResult(loss.item(), num_correct.item() / seq_len)
 
     def test_batch(self, batch) -> BatchResult:
@@ -264,14 +260,11 @@ class RNNTrainer(Trainer):
         seq_len = y.shape[1]
 
         with torch.no_grad():
-            # TODO:
-            #  Evaluate the RNN model on one batch of data.
-            #  - Forward pass
-            #  - Loss calculation
-            #  - Calculate number of correct predictions
-            # ====== YOUR CODE: ======
-            raise NotImplementedError()
-            # ========================
+            out, self.hidden_state = self.model(x, self.hidden_state)
+            out_t = out.transpose(1, 2)
+            loss = self.loss_fn(out_t, y)
+            y_pred = out_t.argmax(dim=1)
+            num_correct = (y_pred == y).sum()
 
         return BatchResult(loss.item(), num_correct.item() / seq_len)
 
