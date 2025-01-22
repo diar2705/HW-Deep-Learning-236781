@@ -76,47 +76,49 @@ part1_q4 = r"""
 # ==============
 # Part 2 answers
 
-PART2_CUSTOM_DATA_URL = None
+PART2_CUSTOM_DATA_URL = "https://github.com/AviaAvraham1/TempDatasets/raw/refs/heads/main/George_W_Bush2.zip"
 
 
 def part2_vae_hyperparams():
     hypers = dict(
         batch_size=0, h_dim=0, z_dim=0, x_sigma2=0, learn_rate=0.0, betas=(0.0, 0.0),
     )
-    # TODO: Tweak the hyperparameters to generate a former president.
-    # ====== YOUR CODE: ======
-    hypers["batch_size"] = 96
-    hypers["h_dim"] = 512
-    hypers["z_dim"] = 64
-    hypers["x_sigma2"] = 0.1
-    hypers["learn_rate"] = 0.0002
-    hypers["betas"] = (0.9, 0.999)
-    # ========================
+    hypers['batch_size'] = 32
+    hypers['h_dim'] = 512
+    hypers['z_dim'] = 64
+    hypers['learn_rate'] = 1e-3
+    hypers['betas'] = (0.9, 0.999)
+    hypers['x_sigma2'] = 0.1
     return hypers
 
 
 part2_q1 = r"""
-**Your answer:**
+**Answer:**
+The $\sigma^2$ hyperparameter (`x_sigma2` in the code) controls the variance of the Gaussian distribution used in the decoder's likelihood function. 
 
-
+- Low values of $\sigma^2$ make the model focus more on reconstructing the input data accurately, leading to sharper images but potentially overfitting.
+- High values of $\sigma^2$ allow for more variability in the generated images, which can help in capturing the underlying data distribution better but may result in blurrier images.
 """
 
 part2_q2 = r"""
-**Your answer:**
+**Answer:**
+1. The VAE loss term consists of two parts: the reconstruction loss and the KL divergence loss.
+   - The reconstruction loss measures how well the decoder can reconstruct the input data from the latent representation. It ensures that the generated data is similar to the input data.
+   - The KL divergence loss measures the difference between the learned latent space distribution and the prior distribution (usually a standard normal distribution). It ensures that the latent space follows the desired distribution, allowing for meaningful sampling.
 
+2. The KL loss term regularizes the latent space distribution to be close to the prior distribution. This prevents the latent space from becoming too irregular and ensures that it can be sampled from effectively.
 
+3. The benefit of this effect is that it allows the VAE to generate new, meaningful samples by sampling from the latent space. The regularized latent space ensures that the generated samples are similar to the training data and follow the learned distribution.
 """
 
 part2_q3 = r"""
-**Your answer:**
-
-
-
+**Answer:**
+Maximizing the evidence distribution, $p(X)$, ensures that the model learns to generate data that is similar to the training data. By doing so, we ensure that the model captures the underlying data distribution and can generate new samples that are representative of the training data. This is crucial for the VAE to function as a generative model.
 """
 
 part2_q4 = r"""
-**Your answer:**
-
+**Answer:**
+In the VAE encoder, we model the **log** of the latent-space variance, $\sigma^2_{\alpha}$, instead of directly modeling the variance to ensure numerical stability and to avoid negative values. The log transformation ensures that the variance is always positive, which is a requirement for the Gaussian distribution. Additionally, it allows for a more stable and efficient optimization process.
 """
 
 # Part 3 answers
