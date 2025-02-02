@@ -124,12 +124,25 @@ In the VAE encoder, we model the **log** of the latent-space variance, $\sigma^2
 # Part 3 answers
 def part3_gan_hyperparams():
     hypers = dict(
-        batch_size=0, h_dim=0, z_dim=0, x_sigma2=0, learn_rate=0.0, betas=(0.0, 0.0),
+        batch_size=0, z_dim=0, discriminator_optimizer=dict(type="", lr=0.0, betas=(0.0, 0.0)),
+        generator_optimizer=dict(type="", lr=0.0, betas=(0.0, 0.0)), data_label=0,label_noise=0.0
     )
-    # TODO: Tweak the hyperparameters to generate a former president.
-    # ====== YOUR CODE: ======
+    hypers["batch_size"] = 16
+    hypers["z_dim"] = 128
+    hypers["discriminator_optimizer"] = {
+        "type": "Adam",
+        "lr": 0.0003,
+        "betas": (0.5, 0.999),
+    }
 
-    # ========================
+    hypers["generator_optimizer"] = {
+        "type": "Adam",
+        "lr": 0.0003,
+        "betas": (0.5, 0.999),
+    }
+
+    hypers["data_label"] = 0
+    hypers["label_noise"] = 0.4
     return hypers
 
 part3_q1 = r"""
@@ -153,7 +166,7 @@ part3_q3 = r"""
 
 
 
-PART3_CUSTOM_DATA_URL = None
+PART3_CUSTOM_DATA_URL = "https://github.com/AviaAvraham1/TempDatasets/raw/refs/heads/main/George_W_Bush2.zip"
 
 
 def part4_transformer_encoder_hyperparams():

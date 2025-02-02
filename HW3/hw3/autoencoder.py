@@ -13,7 +13,11 @@ class EncoderCNN(nn.Module):
         for i in range(len(channels) - 1):
             modules.append(
                 nn.Conv2d(
-                    channels[i], channels[i + 1], kernel_size=4, stride=2, padding=1
+                    in_channels=channels[i],
+                    out_channels=channels[i + 1],
+                    kernel_size=4,
+                    stride=2,
+                    padding=1,
                 )
             )
             modules.append(nn.BatchNorm2d(channels[i + 1]))
@@ -106,7 +110,9 @@ class VAE(nn.Module):
         samples = []
         device = next(self.parameters()).device
         with torch.no_grad():
-            samples = self.decode(torch.randn((n, self.z_dim), device=device))
+            for _ in range(n):
+                z = torch.randn((1, self.z_dim), device=device)
+                samples.append(self.decode(z).squeeze(0))
 
         # Detach and move to CPU for display purposes
         samples = [s.detach().cpu() for s in samples]
