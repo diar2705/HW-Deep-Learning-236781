@@ -83,9 +83,9 @@ def part2_vae_hyperparams():
     hypers = dict(
         batch_size=0, h_dim=0, z_dim=0, x_sigma2=0, learn_rate=0.0, betas=(0.0, 0.0),
     )
-    hypers['batch_size'] = 32
-    hypers['h_dim'] = 512
-    hypers['z_dim'] = 64
+    hypers['batch_size'] = 16
+    hypers['h_dim'] = 256
+    hypers['z_dim'] = 32
     hypers['learn_rate'] = 1e-3
     hypers['betas'] = (0.9, 0.999)
     hypers['x_sigma2'] = 0.1
@@ -127,22 +127,24 @@ def part3_gan_hyperparams():
         batch_size=0, z_dim=0, discriminator_optimizer=dict(type="", lr=0.0, betas=(0.0, 0.0)),
         generator_optimizer=dict(type="", lr=0.0, betas=(0.0, 0.0)), data_label=0,label_noise=0.0
     )
-    hypers["batch_size"] = 16
+    hypers["batch_size"] = 8
     hypers["z_dim"] = 128
     hypers["discriminator_optimizer"] = {
         "type": "Adam",
-        "lr": 0.0003,
+        "lr": 0.0002 ,
         "betas": (0.5, 0.999),
+        "weight_decay": 1e-5,
     }
 
     hypers["generator_optimizer"] = {
         "type": "Adam",
-        "lr": 0.0003,
+        "lr": 0.0002,
         "betas": (0.5, 0.999),
+        "weight_decay": 1e-5,
     }
 
     hypers["data_label"] = 0
-    hypers["label_noise"] = 0.4
+    hypers["label_noise"] = 0.3
     return hypers
 
 part3_q1 = r"""

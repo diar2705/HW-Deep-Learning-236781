@@ -64,7 +64,7 @@ class Generator(nn.Module):
                 z_dim, 512, kernel_size=featuremap_size, padding=1
             ),
             nn.BatchNorm2d(512),
-            nn.LeakyReLU(0.2, inplace=True),
+            nn.GELU(),
         )
         self.cnn = DecoderCNN(in_channels=512, out_channels=out_channels)
 
@@ -177,22 +177,31 @@ def train_batch(
 
     device = next(dsc_model.parameters()).device
     x_data = x_data.to(device)
+    batch_size = x_data.size(0)
 
-    # Generate fake data
-    fake_sampled_data = gen_model.sample(x_data.size(0), with_grad=True)
+    # === Generate Fake Data ===
+    fake_sampled_data = gen_model.sample(batch_size, with_grad=True)
 
-    # Discriminator update
+    # === Discriminator Update ===
     dsc_optimizer.zero_grad()
-    y_data = dsc_model(x_data).view(-1)
-    y_generated_without_grad = dsc_model(fake_sampled_data.detach()).view(-1)
-    dsc_loss = dsc_loss_fn(y_data, y_generated_without_grad)
+
+    # Discriminator evaluates real and fake data
+    y_real = dsc_model(x_data).view(-1)  # Real data predictions
+    y_fake = dsc_model(fake_sampled_data.detach()).view(-1)  # Fake data predictions
+
+    # Compute discriminator loss
+    dsc_loss = dsc_loss_fn(y_real, y_fake)
+
     dsc_loss.backward()
     dsc_optimizer.step()
 
-    # Generator update
+    # === Generator Update ===
     gen_optimizer.zero_grad()
-    y_generated_with_grad = dsc_model(fake_sampled_data).view(-1)
-    gen_loss = gen_loss_fn(y_generated_with_grad)
+
+    # Generator wants discriminator to classify fake samples as real
+    y_fake_for_gen = dsc_model(fake_sampled_data).view(-1)
+    gen_loss = gen_loss_fn(y_fake_for_gen)
+
     gen_loss.backward()
     gen_optimizer.step()
 
@@ -216,7 +225,7 @@ def save_checkpoint(gen_model, dsc_losses, gen_losses, checkpoint_file):
     #  You should decide what logic to use for deciding when to save.
     #  If you save, set saved to True.
     # Save a checkpoint of the generator model if the generator loss has improved
-    if len(gen_losses) > 1 and gen_losses[-1] < min(gen_losses[:-1]):
+    if len(gen_losses) % 5 == 0:
         torch.save(gen_model, checkpoint_file)
         print(f"*** Saved checkpoint {checkpoint_file} ")
         saved = True
