@@ -144,7 +144,7 @@ def part3_gan_hyperparams():
     }
 
     hypers["data_label"] = 0
-    hypers["label_noise"] = 0.3
+    hypers["label_noise"] = 0.4
     return hypers
 
 part3_q1 = r"""
