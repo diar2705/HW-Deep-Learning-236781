@@ -147,8 +147,17 @@ def generator_loss_fn(y_generated, data_label=0):
     #  Think about what you need to compare the input to, in order to
     #  formulate the loss in terms of Binary Cross Entropy.
     # The generator wants the discriminator to think the generated data is real
-    target_labels = torch.full_like(y_generated, data_label)
-    return F.binary_cross_entropy_with_logits(y_generated, target_labels)
+    device = y_generated.device
+    batch_size = y_generated.size(0)
+
+    # The generator wants the discriminator to think the generated data is real.
+    # So, the target labels are the *real* data label (data_label).
+    target_labels = torch.full((batch_size, 1), data_label, dtype=torch.float, device=device)  # Shape (N, 1)
+
+    # Calculate the loss using Binary Cross Entropy with Logits.
+    loss = F.binary_cross_entropy_with_logits(y_generated.view(-1,1), target_labels)
+
+    return loss
 
 
 def train_batch(

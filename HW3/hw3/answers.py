@@ -146,21 +146,47 @@ def part3_gan_hyperparams():
     return hypers
 
 part3_q1 = r"""
-**Your answer:**
+**Answer:**
 
+During GAN training, gradients are maintained when updating the parameters of either the Generator or the Discriminator.
+When training the Generator, gradients are crucial because they indicate how changes in the Generator's
+output affect the Discriminator's ability to classify fakes, allowing the Generator to improve.  Similarly,
+when training the Discriminator, gradients are essential for the Discriminator to learn how to better distinguish real data from the Generator's
+fakes.  However, once training is complete and the goal is simply to use the trained Generator to sample and create new data, 
+gradients are discarded. In this phase, we're no longer adjusting the network's parameters, 
+we're just leveraging the learned mapping from noise to data, making gradient calculation unnecessary and computationally wasteful.
 
 """
 
 part3_q2 = r"""
-**Your answer:**
+**Answer:**
 
+**1.** Stopping GAN training solely because the Generator loss is low is a bad idea. 
+A low Generator loss can be misleading; it could mean the Generator is creating fantastic images,
+but it could also mean the Discriminator isn't doing its job well, or that the Generator is only making a small variety of good images.
+The goal is to find a balance where both the Generator and Discriminator are performing well and neither can easily improve without the 
+other also improving. This balance is tricky to find directly.  Therefore, it's important to look at more than just the Generator loss.
+Monitor both the Generator and Discriminator losses, and stop when they level off and aren't changing much. 
 
+**2.** if the discriminator loss remains at a constant value while the generator loss decreases,
+it suggests that the generator is improving and producing more realistic samples, 
+but the discriminator is not adapting effectively to these changes. This could happen because the discriminator has reached a point where 
+it can no longer distinguish between real and generated samples as effectively, or it may be stuck in a suboptimal state. 
+The constant discriminator loss indicates that its performance is not improving, while the decreasing generator loss shows 
+that the generator is becoming better at fooling the discriminator. This imbalance could lead to mode collapse or unstable training,
+as the discriminator fails to provide meaningful feedback to the generator. 
 """
 
 part3_q3 = r"""
-**Your answer:**
+**Answer:**
 
 
+The main difference between the VAE and GAN-generated images is that VAE outputs appear blurry and smooth, 
+while GAN outputs are sharper and more detailed. This difference is caused by how each model generates images:
+VAEs optimize for a structured and continuous latent space by minimizing a reconstruction loss combined with a regularization term, 
+which results in smooth but less detailed images. In contrast, GANs use an adversarial process where a generator competes against a discriminator, 
+pushing the generator to produce more realistic and sharper images. However, while GANs generate high-quality images, 
+they can introduce artifacts or suffer from mode collapse, producing less diverse outputs.
 
 """
 
@@ -186,19 +212,6 @@ def part4_transformer_encoder_hyperparams():
     # ========================
     return hypers
 
-
-
-
-part3_q1 = r"""
-**Your answer:**
-
-"""
-
-part3_q2 = r"""
-**Your answer:**
-
-
-"""
 
 
 part4_q1 = r"""
