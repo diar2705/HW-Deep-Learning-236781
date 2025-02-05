@@ -302,12 +302,14 @@ class TransformerEncoderTrainer(Trainer):
         
         loss = None
         num_correct = None
-        # TODO:
-        #  fill out the training loop.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
         
+        pred = self.model(input_ids, attention_mask).to(self.device).squeeze(-1)
+        
+        self.optimizer.zero_grad()
+        loss = self.loss_fn(pred, label)
+        loss.backward()
+        self.optimizer.step()
+        num_correct = (pred.sigmoid().round() == label).sum()
         
         
         return BatchResult(loss.item(), num_correct.item())
@@ -321,12 +323,9 @@ class TransformerEncoderTrainer(Trainer):
             loss = None
             num_correct = None
             
-            # TODO:
-            #  fill out the testing loop.
-            # ====== YOUR CODE: ======
-            raise NotImplementedError()
-            # ========================
-
+            pred = self.model(input_ids, attention_mask).to(self.device).squeeze(-1)
+            loss = self.loss_fn(pred, label)
+            num_correct = (pred.sigmoid().round() == label).sum()
             
         
         return BatchResult(loss.item(), num_correct.item())

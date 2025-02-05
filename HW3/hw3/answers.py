@@ -207,11 +207,14 @@ def part4_transformer_encoder_hyperparams():
         droupout = 0.0,
         lr=0.0,
     )
-
-    # TODO: Tweak the hyperparameters to train the transformer encoder.
-    # ====== YOUR CODE: ======
     
-    # ========================
+    hypers['embed_dim'] = 128
+    hypers['num_heads'] = 4
+    hypers['num_layers'] = 4
+    hypers['hidden_dim'] = 256
+    hypers['window_size'] = 128
+    hypers['dropout'] = 0.2
+    hypers['lr'] = 1e-4
     return hypers
 
 
