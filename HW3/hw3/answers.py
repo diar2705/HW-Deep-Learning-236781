@@ -220,32 +220,59 @@ def part4_transformer_encoder_hyperparams():
 
 
 part4_q1 = r"""
-**Your answer:**
+**Answer:**
 
+Stacking encoder layers with sliding-window attention broadens the context in the final layer by progressively integrating information,
+much like CNNs expand receptive fields. Each layer captures local dependencies within its window, and by stacking layers,
+subsequent layers attend to outputs that already incorporate contextual information from previous layers. 
+This hierarchical processing effectively expands the receptive field of each layer, 
+allowing the final layer to encompass a significantly broader context and capture longer-range dependencies, 
+leading to a more comprehensive understanding of the input sequence.
 
 """
 
 part4_q2 = r"""
-**Your answer:**
+**Answer:**
+
+One variation to achieve a more global context with similar computational complexity to sliding-window attention (O(nw)) 
+is Dilated Sliding-Window Attention.  Instead of attending to consecutive positions within the window, 
+dilated attention introduces "gaps" by attending to positions with a certain "dilation rate."  For example,
+with a dilation rate of 2, the attention window might look at positions i-2, i, and i+2 around the current position i, 
+instead of i-1, i, and i+1 in standard sliding-window attention.  
+This effectively increases the receptive field and allows each layer to capture broader context and longer-range dependencies 
+without significantly increasing the computational cost, as the number of attended positions per query remains similar (window size w).
+Stacking these dilated sliding-window attention layers further expands the global context captured in deeper layers, 
+enabling the model to understand relationships across larger segments of the input sequence while maintaining efficiency.
+
+"""
+
+part5_q1 = r"""
+**Answer:**
+
+
+"""
+
+part5_q2 = r"""
+**Answer:**
 
 
 """
 
 
-part4_q3= r"""
-**Your answer:**
+part5_q3= r"""
+**Answer:**
 
 
 """
 
-part4_q4 = r"""
-**Your answer:**
+part5_q4 = r"""
+**Answer:**
 
 
 """
 
-part4_q5 = r"""
-**Your answer:**
+part5_q5 = r"""
+**Answer:**
 
 
 """

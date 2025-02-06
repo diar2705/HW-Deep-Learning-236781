@@ -83,9 +83,9 @@ def part2_vae_hyperparams():
     hypers = dict(
         batch_size=0, h_dim=0, z_dim=0, x_sigma2=0, learn_rate=0.0, betas=(0.0, 0.0),
     )
-    hypers['batch_size'] = 32
-    hypers['h_dim'] = 512
-    hypers['z_dim'] = 64
+    hypers['batch_size'] = 16
+    hypers['h_dim'] = 256
+    hypers['z_dim'] = 32
     hypers['learn_rate'] = 1e-3
     hypers['betas'] = (0.9, 0.999)
     hypers['x_sigma2'] = 0.1
@@ -127,18 +127,20 @@ def part3_gan_hyperparams():
         batch_size=0, z_dim=0, discriminator_optimizer=dict(type="", lr=0.0, betas=(0.0, 0.0)),
         generator_optimizer=dict(type="", lr=0.0, betas=(0.0, 0.0)), data_label=0,label_noise=0.0
     )
-    hypers["batch_size"] = 16
+    hypers["batch_size"] = 8
     hypers["z_dim"] = 128
     hypers["discriminator_optimizer"] = {
         "type": "Adam",
-        "lr": 0.0003,
+        "lr": 0.0002 ,
         "betas": (0.5, 0.999),
+        "weight_decay": 1e-5,
     }
 
     hypers["generator_optimizer"] = {
         "type": "Adam",
-        "lr": 0.0003,
+        "lr": 0.0002,
         "betas": (0.5, 0.999),
+        "weight_decay": 1e-5,
     }
 
     hypers["data_label"] = 0
@@ -148,20 +150,45 @@ def part3_gan_hyperparams():
 part3_q1 = r"""
 **Answer:**
 
-During GAN training, gradients are maintained when updating the parameters of either the Generator or the Discriminator.  When training the Generator, gradients are crucial because they indicate how changes in the Generator's output affect the Discriminator's ability to classify fakes, allowing the Generator to improve.  Similarly, when training the Discriminator, gradients are essential for the Discriminator to learn how to better distinguish real data from the Generator's fakes.  However, once training is complete and the goal is simply to use the trained Generator to sample and create new data, gradients are discarded.  In this inference phase, we're no longer adjusting the network's parameters; we're just leveraging the learned mapping from noise to data, making gradient calculation unnecessary and computationally wasteful.
+During GAN training, gradients are maintained when updating the parameters of either the Generator or the Discriminator.
+When training the Generator, gradients are crucial because they indicate how changes in the Generator's
+output affect the Discriminator's ability to classify fakes, allowing the Generator to improve.  Similarly,
+when training the Discriminator, gradients are essential for the Discriminator to learn how to better distinguish real data from the Generator's
+fakes.  However, once training is complete and the goal is simply to use the trained Generator to sample and create new data, 
+gradients are discarded. In this phase, we're no longer adjusting the network's parameters, 
+we're just leveraging the learned mapping from noise to data, making gradient calculation unnecessary and computationally wasteful.
 
 """
 
 part3_q2 = r"""
-**Your answer:**
+**Answer:**
 
+**1.** Stopping GAN training solely because the Generator loss is low is a bad idea. 
+A low Generator loss can be misleading; it could mean the Generator is creating fantastic images,
+but it could also mean the Discriminator isn't doing its job well, or that the Generator is only making a small variety of good images.
+The goal is to find a balance where both the Generator and Discriminator are performing well and neither can easily improve without the 
+other also improving. This balance is tricky to find directly.  Therefore, it's important to look at more than just the Generator loss.
+Monitor both the Generator and Discriminator losses, and stop when they level off and aren't changing much. 
 
+**2.** if the discriminator loss remains at a constant value while the generator loss decreases,
+it suggests that the generator is improving and producing more realistic samples, 
+but the discriminator is not adapting effectively to these changes. This could happen because the discriminator has reached a point where 
+it can no longer distinguish between real and generated samples as effectively, or it may be stuck in a suboptimal state. 
+The constant discriminator loss indicates that its performance is not improving, while the decreasing generator loss shows 
+that the generator is becoming better at fooling the discriminator. This imbalance could lead to mode collapse or unstable training,
+as the discriminator fails to provide meaningful feedback to the generator. 
 """
 
 part3_q3 = r"""
-**Your answer:**
+**Answer:**
 
 
+The main difference between the VAE and GAN-generated images is that VAE outputs appear blurry and smooth, 
+while GAN outputs are sharper and more detailed. This difference is caused by how each model generates images:
+VAEs optimize for a structured and continuous latent space by minimizing a reconstruction loss combined with a regularization term, 
+which results in smooth but less detailed images. In contrast, GANs use an adversarial process where a generator competes against a discriminator, 
+pushing the generator to produce more realistic and sharper images. However, while GANs generate high-quality images, 
+they can introduce artifacts or suffer from mode collapse, producing less diverse outputs.
 
 """
 
@@ -180,42 +207,59 @@ def part4_transformer_encoder_hyperparams():
         droupout = 0.0,
         lr=0.0,
     )
-
-    # TODO: Tweak the hyperparameters to train the transformer encoder.
-    # ====== YOUR CODE: ======
     
-    # ========================
+    hypers['embed_dim'] = 128
+    hypers['num_heads'] = 4
+    hypers['num_layers'] = 4
+    hypers['hidden_dim'] = 256
+    hypers['window_size'] = 128
+    hypers['dropout'] = 0.2
+    hypers['lr'] = 1e-4
     return hypers
 
 
 
 part4_q1 = r"""
-**Your answer:**
+**Answer:**
 
+Stacking encoder layers with sliding-window attention broadens the context in the final layer by progressively integrating information, much like CNNs expand receptive fields. Each layer captures local dependencies within its window, and by stacking layers, subsequent layers attend to outputs that already incorporate contextual information from previous layers. This hierarchical processing effectively expands the receptive field of each layer, allowing the final layer to encompass a significantly broader context and capture longer-range dependencies, leading to a more comprehensive understanding of the input sequence.
 
 """
 
 part4_q2 = r"""
-**Your answer:**
+**Answer:**
+
+One variation to achieve a more global context with similar computational complexity to sliding-window attention (O(nw)) is Dilated Sliding-Window Attention.  Instead of attending to consecutive positions within the window, dilated attention introduces "gaps" by attending to positions with a certain "dilation rate."  For example, with a dilation rate of 2, the attention window might look at positions i-2, i, and i+2 around the current position i, instead of i-1, i, and i+1 in standard sliding-window attention.  This effectively increases the receptive field and allows each layer to capture broader context and longer-range dependencies without significantly increasing the computational cost, as the number of attended positions per query remains similar (window size w). Stacking these dilated sliding-window attention layers further expands the global context captured in deeper layers, enabling the model to understand relationships across larger segments of the input sequence while maintaining efficiency.
+
+"""
+
+part5_q1 = r"""
+**Answer:**
+
+
+"""
+
+part5_q2 = r"""
+**Answer:**
 
 
 """
 
 
-part4_q3= r"""
-**Your answer:**
+part5_q3= r"""
+**Answer:**
 
 
 """
 
-part4_q4 = r"""
-**Your answer:**
+part5_q4 = r"""
+**Answer:**
 
 
 """
 
-part4_q5 = r"""
-**Your answer:**
+part5_q5 = r"""
+**Answer:**
 
 
 """
