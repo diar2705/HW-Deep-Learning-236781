@@ -337,28 +337,31 @@ class FineTuningTrainer(Trainer):
     def train_batch(self, batch) -> BatchResult:
         
         input_ids = batch["input_ids"].to(self.device)
-        attention_masks = batch["attention_mask"]
-        labels= batch["label"]
-        # TODO:
-        #  fill out the training loop.
-        # ====== YOUR CODE: ======
+        attention_masks = batch["attention_mask"].to(self.device)
+        labels= batch["label"].to(self.device)
 
-        raise NotImplementedError()
-        
-        # ========================
+        out = self.model(input_ids=input_ids, attention_mask=attention_masks, labels=labels)
+        loss = out.loss
+        logits = out.logits
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+        loss = loss.item()
+        num_correct = (logits.sigmoid().argmax(dim=1) == labels).sum().item()
         
         return BatchResult(loss, num_correct)
         
     def test_batch(self, batch) -> BatchResult:
         
         input_ids = batch["input_ids"].to(self.device)
-        attention_masks = batch["attention_mask"]
-        labels= batch["label"]
+        attention_masks = batch["attention_mask"].to(self.device)
+        labels= batch["label"].to(self.device)
         
         with torch.no_grad():
-            # TODO:
-            #  fill out the training loop.
-            # ====== YOUR CODE: ======
-            raise NotImplementedError()
-            # ========================
+            out = self.model(input_ids=input_ids, attention_mask=attention_masks, labels=labels)
+            loss = out.loss
+            logits = out.logits
+            loss = loss.item()
+            num_correct = (logits.sigmoid().argmax(dim=1) == labels).sum().item()
+
         return BatchResult(loss, num_correct)
