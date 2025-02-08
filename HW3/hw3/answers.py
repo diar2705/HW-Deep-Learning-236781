@@ -249,18 +249,50 @@ enabling the model to understand relationships across larger segments of the inp
 part5_q1 = r"""
 **Answer:**
 
+Fine-tuning DistilBERT worked better for sentiment analysis than starting from zero.
+This is because DistilBERT already learned a lot about language from huge amounts of text before we used it.
+This pre-learning gave it a strong base for understanding words and their context, 
+which is better than a new model trained only for sentiment. Fine-tuning, especially training all parts of DistilBERT, 
+let it adjust to the specific feelings in text. Both ways of fine-tuning DistilBERT got much better results (almost 80% accuracy) 
+compared to training from scratch (around 69.5% accuracy). However, fine-tuning isn't always better. It depends on the task. 
+Pre-trained models are great when the new task is similar to what they already learned. But for very different tasks,
+training from scratch might be needed. This DistilBERT example shows how helpful pre-trained models can be for tasks like understanding sentiment.
 
 """
 
 part5_q2 = r"""
 **Answer:**
 
-
+Fine-tuning only the middle layers while freezing both the initial and final layers is generally less effective and
+often yields worse results compared to fine-tuning the last layers or the entire model.  
+This is because pre-trained models are structured hierarchically: early and middle layers learn general, 
+reusable features, while the final layers are specifically tailored for the original pre-training task's output. 
+By freezing the last layers, you prevent the model from adapting its task-specific decision-making process to the new task. 
+While fine-tuning middle layers can adjust the learned representations, the frozen last layers, designed for the pre-training task, 
+might not optimally utilize these updated representations, leading to a mismatch and hindering performance on the new task.  
+Although in rare cases of significant data distribution shifts this approach might offer some benefit, 
+it's generally less robust and less likely to be successful for typical fine-tuning scenarios compared to focusing on the task-specific final layers.
 """
 
 
 part5_q3= r"""
 **Answer:**
+
+The standard BERT architecture, in its original form, is not directly equipped for machine translation.
+This limitation stems from BERT's inherent design as an encoder-only model, optimized for understanding and representing input sequences, 
+not for generating new ones.  BERT's pre-training objectives, such as Masked Language Modeling and Next Sentence Prediction, 
+are geared towards learning rich contextual representations within a single sequence.  For machine translation, however, 
+the task is fundamentally different: it requires generating a target sequence in a different language conditioned on a source sequence.
+BERT lacks the decoder component necessary for this sequential generation process, making it unsuitable for direct application to machine translation tasks.
+
+To adapt BERT for machine translation, a significant architectural modification is essential: the addition of a decoder.  
+This transformation results in an encoder-decoder architecture where BERT functions as the encoder, 
+processing the source language tokens into contextualized embeddings.  A separate decoder component, typically a Transformer decoder,
+is then introduced to generate the target language sequence token by token.  This decoder attends to the encoded source representations
+from BERT and utilizes previously generated target tokens to predict the next token in the translated sequence.  Furthermore,
+to optimize for translation performance, adjustments to pre-training are highly beneficial.  While BERT's original pre-training provides
+valuable general language understanding, pre-training specifically on parallel corpora or with sequence-to-sequence objectives would better 
+equip the model to learn cross-lingual mappings and generation patterns crucial for effective machine translation.
 
 
 """
@@ -268,13 +300,28 @@ part5_q3= r"""
 part5_q4 = r"""
 **Answer:**
 
+ RNNs might be chosen over Transformers due to their inherent sequential processing which can be advantageous for certain tasks and data types. 
+ RNNs naturally process data in a step-by-step manner, maintaining a hidden state that evolves sequentially, 
+ making them conceptually simpler and potentially more intuitive for tasks where the temporal order of data is crucial and must be explicitly
+ modeled at each step.  This sequential inductive bias can be beneficial in scenarios like real-time streaming data processing or tasks where
+ the immediate past context is paramount, offering a more direct and potentially more interpretable approach compared to the parallel-by-design 
+ Transformer architecture, even in its lightweight form.
 
 """
 
 part5_q5 = r"""
 **Answer:**
 
+BERT's Next Sentence Prediction (NSP) task pre-trains the model to determine if two sentences follow each other in the original text. 
+During training, BERT receives sentence pairs, half of which are consecutive ("IsNext"), and half are random pairs ("NotNext"). 
+The model predicts "IsNext" or "NotNext" using the [CLS] token's output and optimizes this binary classification with cross-entropy loss.
+Initially, NSP was included to foster sentence relationship understanding, believed necessary for tasks requiring cross-sentence reasoning.
 
+However, current evidence suggests NSP is not a crucial pre-training component. 
+While intended to enhance inter-sentence understanding, studies and model variants like RoBERTa and DistilBERT show that removing or omitting NSP
+doesn't harm, and sometimes even improves, downstream task performance. This indicates Masked Language Modeling (MLM) is the more dominant task, 
+implicitly capturing sufficient sentence-level context. Furthermore, NSP might be too simplistic for BERT, allowing it to learn superficial cues 
+like topical consistency without truly grasping deeper inter-sentence relationships, thus limiting its added value to pre-training.
 """
 
 
