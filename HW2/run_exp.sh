@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# simple runner for the experiments.
+
 # exp 1
 K1_values=(32 64)
 L1_values=(2 4 8)

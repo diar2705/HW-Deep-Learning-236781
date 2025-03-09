@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# simple runner for experiment 4.
+
 # exp 4
 
 for L in {8,16}; do
