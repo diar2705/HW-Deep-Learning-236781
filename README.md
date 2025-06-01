@@ -4,13 +4,13 @@ This repository contains homework assignments for the [CS236781](https://vistala
 
 It is created by [Diar Batheesh](https://github.com/diar2705) and [Hadi Hboos](https://github.com/HadiHboos1).
 
-## HW1  
+## HW1 $(97)$
 
 - Part 1: Working with data in `PyTorch`
 - Part 2: Multiclass linear classification
 - Part 3: Linear Regression
 
-## HW2
+## HW2 $(98)$
 
 - Part 1: Backpropagation
 - Part 2: Optimization and Training
@@ -19,7 +19,7 @@ It is created by [Diar Batheesh](https://github.com/diar2705) and [Hadi Hboos](h
 - Part 5: Convolutional Architecture Experiments
 - Part 6: YOLO - Object Detection
 
-## HW3
+## HW3 $(92)$
 
 - Part 1: Sequence Models
 - Part 2: Variational Autoencoder
